@@ -16,6 +16,15 @@ public class WaterZone : MonoBehaviour
     [SerializeField] private float splashGravity = 0.35f;
     [SerializeField] private Color splashColor = new Color(0.42f, 0.74f, 1f, 0.92f);
 
+    [Header("Visual Settings")]
+    [SerializeField] private Color waterColor = new Color(0f, 0.5f, 1f, 0.15f);
+    
+    [Header("Optional Elements")]
+    [SerializeField] private ParticleSystem bubbleParticles;
+
+    private SpriteRenderer waterSpriteRenderer;
+    private static int playersInWater = 0;
+
     private BoxCollider2D waterCollider;
     private static Material runtimeSplashMaterial;
     private static Sprite runtimeSplashSprite;
@@ -23,6 +32,51 @@ public class WaterZone : MonoBehaviour
     private void Awake()
     {
         waterCollider = GetComponent<BoxCollider2D>();
+        waterCollider.isTrigger = true;
+
+        SetupWaterVisuals();
+        if (bubbleParticles != null)
+        {
+            var shape = bubbleParticles.shape;
+            shape.shapeType = ParticleSystemShapeType.Box;
+            shape.scale = new Vector3(waterCollider.size.x, waterCollider.size.y, 1f);
+            bubbleParticles.transform.localPosition = waterCollider.offset;
+        }
+    }
+
+    private void SetupWaterVisuals()
+    {
+        waterSpriteRenderer = GetComponent<SpriteRenderer>();
+        if (waterSpriteRenderer == null)
+            waterSpriteRenderer = gameObject.AddComponent<SpriteRenderer>();
+
+        if (waterSpriteRenderer.sprite == null)
+        {
+            Texture2D tex = new Texture2D(16, 16);
+            Color[] pixels = new Color[16 * 16];
+            for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.white;
+            tex.SetPixels(pixels);
+            tex.Apply();
+            waterSpriteRenderer.sprite = Sprite.Create(tex, new Rect(0, 0, 16, 16), new Vector2(0.5f, 0.5f), 16, 0, SpriteMeshType.FullRect, new Vector4(1, 1, 1, 1));
+            waterSpriteRenderer.drawMode = SpriteDrawMode.Sliced;
+        }
+
+        waterSpriteRenderer.color = waterColor;
+        waterSpriteRenderer.size = waterCollider.size;
+        // waterSpriteRenderer.transform.localPosition = waterCollider.offset; // BU SATIR OBJENİN KONUMUNU SIFIRLIYORDU
+        waterSpriteRenderer.sortingOrder = 10;
+    }
+
+    private void OnValidate()
+    {
+        if (waterCollider == null) waterCollider = GetComponent<BoxCollider2D>();
+        waterSpriteRenderer = GetComponent<SpriteRenderer>();
+
+        if (waterCollider != null && waterSpriteRenderer != null)
+        {
+            waterSpriteRenderer.size = waterCollider.size;
+            // waterSpriteRenderer.transform.localPosition = waterCollider.offset; // BU SATIR OBJENİN KONUMUNU SIFIRLIYORDU
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -53,7 +107,22 @@ public class WaterZone : MonoBehaviour
             SpawnSplashEffect(GetSplashPosition(collision.bounds), velocity);
         }
 
-        player.ApplyModeProperties(targetMode);
+        player.ApplyModeProperties(targetMode, true);
+
+        if (targetMode == PlayerMode.Water)
+        {
+            playersInWater++;
+            if (bubbleParticles != null && !bubbleParticles.isPlaying)
+                bubbleParticles.Play();
+        }
+        else
+        {
+            playersInWater--;
+            if (playersInWater < 0) playersInWater = 0;
+            
+            if (playersInWater == 0 && bubbleParticles != null)
+                bubbleParticles.Stop();
+        }
     }
 
     private Vector3 GetSplashPosition(Bounds actorBounds)
@@ -247,6 +316,47 @@ public class WaterZone : MonoBehaviour
 
         runtimeSplashSprite = textureSheetAnimation.GetSprite(0);
         return runtimeSplashSprite;
+    }
+
+    private void OnDrawGizmos()
+    {
+        BoxCollider2D col = GetComponent<BoxCollider2D>();
+        if (col == null) return;
+
+        // bounds zaten transform.scale'i hesaba katar
+        Bounds bounds = col.bounds;
+        Vector3 center = bounds.center;
+        Vector3 size = bounds.size;
+
+        // Su alanı — mavi yarı saydam dolgulu kutu
+        Gizmos.color = new Color(0f, 0.4f, 0.9f, 0.15f);
+        Gizmos.DrawCube(center, size);
+        Gizmos.color = new Color(0f, 0.5f, 1f, 0.6f);
+        Gizmos.DrawWireCube(center, size);
+
+        // Üst yüzey çizgisi — dalgalı su yüzeyi
+        Gizmos.color = new Color(0.4f, 0.8f, 1f, 0.8f);
+        float topY = bounds.max.y;
+        float leftX = bounds.min.x;
+        float rightX = bounds.max.x;
+        int segments = 20;
+        float step = (rightX - leftX) / segments;
+
+        for (int i = 0; i < segments; i++)
+        {
+            float x1 = leftX + step * i;
+            float x2 = leftX + step * (i + 1);
+            float wave1 = Mathf.Sin(x1 * 3f) * 0.15f;
+            float wave2 = Mathf.Sin(x2 * 3f) * 0.15f;
+            Gizmos.DrawLine(
+                new Vector3(x1, topY + wave1, 0f),
+                new Vector3(x2, topY + wave2, 0f));
+        }
+
+        // Ortada su sembolü
+        Gizmos.color = new Color(0f, 0.6f, 1f, 0.5f);
+        float labelSize = Mathf.Min(size.x, size.y) * 0.08f;
+        Gizmos.DrawWireSphere(center, labelSize);
     }
 
     private static ParticleSystemRenderer FindExistingSplashRenderer()

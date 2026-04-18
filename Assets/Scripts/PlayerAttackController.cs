@@ -2,10 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerController))]
+[RequireComponent(typeof(PlayerInputReader))]
 public class PlayerAttackController : MonoBehaviour
 {
     [Header("References")]
     public PlayerController playerController;
+    public PlayerInputReader inputReader;
 
     [Header("Targeting")]
     public LayerMask enemyLayer = Physics2D.AllLayers;
@@ -33,11 +35,14 @@ public class PlayerAttackController : MonoBehaviour
     {
         if (playerController == null)
             playerController = GetComponent<PlayerController>();
+
+        if (inputReader == null)
+            inputReader = GetComponent<PlayerInputReader>();
     }
 
     private void Update()
     {
-        if (playerController == null)
+        if (playerController == null || inputReader == null)
             return;
 
         if (finAttackCooldownTimer > 0f)
@@ -46,12 +51,12 @@ public class PlayerAttackController : MonoBehaviour
         if (tailElectricCooldownTimer > 0f)
             tailElectricCooldownTimer -= Time.deltaTime;
 
-        if (Input.GetMouseButtonDown(0) && finAttackCooldownTimer <= 0f)
+        if (inputReader.ConsumePrimaryAttackPressed() && finAttackCooldownTimer <= 0f)
         {
             PerformFinAttack();
         }
 
-        if (Input.GetKeyDown(KeyCode.E) && tailElectricCooldownTimer <= 0f)
+        if (inputReader.ConsumeSecondaryAttackPressed() && tailElectricCooldownTimer <= 0f)
         {
             PerformTailElectricAttack();
         }
