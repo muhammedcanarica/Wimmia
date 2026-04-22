@@ -278,8 +278,17 @@ public class WaterZone : MonoBehaviour
 
         if (waterCollider != null && waterSpriteRenderer != null)
         {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.delayCall += () =>
+            {
+                if (this == null) return;
+                waterSpriteRenderer.size = waterCollider.size;
+                waterSpriteRenderer.color = waterColor;
+            };
+#else
             waterSpriteRenderer.size = waterCollider.size;
             waterSpriteRenderer.color = waterColor;
+#endif
         }
     }
 
@@ -383,7 +392,7 @@ public class WaterZone : MonoBehaviour
         velocityOverLifetime.space = ParticleSystemSimulationSpace.World;
         ParticleSystem.MinMaxCurve velocityX = new ParticleSystem.MinMaxCurve(-0.4f, 0.4f);
         ParticleSystem.MinMaxCurve velocityY = new ParticleSystem.MinMaxCurve(0.8f, 1.8f);
-        ParticleSystem.MinMaxCurve velocityZ = new ParticleSystem.MinMaxCurve(0f, 0f);
+        ParticleSystem.MinMaxCurve velocityZ = new ParticleSystem.MinMaxCurve(-0.01f, 0.01f);
         velocityX.mode = ParticleSystemCurveMode.TwoConstants;
         velocityY.mode = ParticleSystemCurveMode.TwoConstants;
         velocityZ.mode = ParticleSystemCurveMode.TwoConstants;

@@ -78,7 +78,7 @@ public static class SetupHitParticle
         
         ParticleSystem.MinMaxCurve curveX = new ParticleSystem.MinMaxCurve(-0.2f, 0.2f);
         ParticleSystem.MinMaxCurve curveY = new ParticleSystem.MinMaxCurve(0.3f, 0.8f);
-        ParticleSystem.MinMaxCurve curveZ = new ParticleSystem.MinMaxCurve(0f, 0f);
+        ParticleSystem.MinMaxCurve curveZ = new ParticleSystem.MinMaxCurve(-0.01f, 0.01f);
 
         curveX.mode = ParticleSystemCurveMode.TwoConstants;
         curveY.mode = ParticleSystemCurveMode.TwoConstants;

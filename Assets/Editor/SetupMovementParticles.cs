@@ -95,7 +95,7 @@ public class SetupMovementParticles : MonoBehaviour
         // Hafif yukarı + rastgele yatay hareket
         ParticleSystem.MinMaxCurve curveX = new ParticleSystem.MinMaxCurve(-0.2f, 0.2f);
         ParticleSystem.MinMaxCurve curveY = new ParticleSystem.MinMaxCurve(0.3f, 0.6f);
-        ParticleSystem.MinMaxCurve curveZ = new ParticleSystem.MinMaxCurve(0f, 0f);
+        ParticleSystem.MinMaxCurve curveZ = new ParticleSystem.MinMaxCurve(-0.01f, 0.01f);
 
         // Unity'nin min==max olan durumlarda modu Constant'a düşürmesini ve uyuşmazlık hatası vermesini engelle
         curveX.mode = ParticleSystemCurveMode.TwoConstants;
