@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerHitStop hitStop;
     [SerializeField] private PlayerDashTrailFeedback dashTrailFeedback;
 
-    public PlayerMode currentMode => stateMachine != null ? stateMachine.CurrentMode : PlayerMode.Water;
+    public PlayerMode currentMode => stateMachine != null ? stateMachine.CurrentMode : PlayerMode.Land;
     public bool IsDashing => stateMachine != null && stateMachine.IsInState(PlayerMotionState.Dash);
     public Vector2 FacingDirection => movement != null ? movement.FacingDirection : Vector2.right;
 

@@ -212,6 +212,22 @@ public class WaterZone : MonoBehaviour
         }
     }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (!collision.CompareTag("Player")) return;
+
+        Rigidbody2D playerRb = collision.attachedRigidbody;
+        if (playerRb == null) return;
+
+        if (!activePlayers.Contains(playerRb))
+        {
+            activePlayers.Add(playerRb);
+
+            if (bubbleParticles != null && !bubbleParticles.isPlaying)
+                bubbleParticles.Play();
+        }
+    }
+
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (!collision.CompareTag("Player")) return;

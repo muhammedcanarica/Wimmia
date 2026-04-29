@@ -12,7 +12,7 @@ public enum PlayerMotionState
 [DisallowMultipleComponent]
 public class PlayerStateMachine : MonoBehaviour
 {
-    public PlayerMode CurrentMode { get; private set; } = PlayerMode.Water;
+    public PlayerMode CurrentMode { get; private set; } = PlayerMode.Land;
     public PlayerMotionState CurrentState { get; private set; } = PlayerMotionState.Idle;
 
     public event Action<PlayerMotionState, PlayerMotionState> StateChanged;

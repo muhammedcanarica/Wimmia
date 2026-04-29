@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
     private static PhysicsMaterial2D frictionlessMaterial;
 
     [Header("Mode")]
-    [SerializeField] private PlayerMode startingMode = PlayerMode.Water;
+    [SerializeField] private PlayerMode startingMode = PlayerMode.Land;
     [SerializeField] private float modeTransitionDuration = 0.15f;
     [SerializeField] private float gravityBlendSpeed = 12f;
     [SerializeField] private float maxWaterExitVerticalSpeed = 12f;
@@ -97,7 +97,9 @@ public class PlayerMovement : MonoBehaviour
         ConfigureBodyForSmoothMotion();
         ConfigureContactMaterials();
 
-        SetMode(startingMode, true);
+        // Always begin in land mode. Water zones can promote the player to water
+        // immediately if the spawn point is inside water.
+        SetMode(PlayerMode.Land, true);
     }
 
     public void SetMode(PlayerMode mode, bool forceInitialize = false)
