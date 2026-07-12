@@ -29,6 +29,8 @@ public class PlayerAttackController : MonoBehaviour
     public bool tailAttackUsesBackDirection = true;
 
     private readonly HashSet<EnemyHealth> processedEnemies = new HashSet<EnemyHealth>();
+    private readonly HashSet<BossWeakPoint> processedBossWeakPoints = new HashSet<BossWeakPoint>();
+    private readonly HashSet<OctopusBossController> processedBosses = new HashSet<OctopusBossController>();
     private readonly HashSet<ElectricSwitch> processedSwitches = new HashSet<ElectricSwitch>();
     private float finAttackCooldownTimer;
     private float tailElectricCooldownTimer;
@@ -91,6 +93,8 @@ public class PlayerAttackController : MonoBehaviour
     private bool DamageEnemies(Collider2D[] hitResults, int damage, bool applyStun, float stunDuration)
     {
         processedEnemies.Clear();
+        processedBossWeakPoints.Clear();
+        processedBosses.Clear();
         bool hitEnemy = false;
 
         for (int i = 0; i < hitResults.Length; i++)
@@ -104,7 +108,26 @@ public class PlayerAttackController : MonoBehaviour
                 enemyHealth = hit.GetComponentInParent<EnemyHealth>();
 
             if (enemyHealth == null)
+            {
+                BossWeakPoint bossWeakPoint = hit.GetComponent<BossWeakPoint>();
+                if (bossWeakPoint == null)
+                    bossWeakPoint = hit.GetComponentInParent<BossWeakPoint>();
+
+                if (bossWeakPoint == null || !processedBossWeakPoints.Add(bossWeakPoint))
+                    continue;
+
+                if (!bossWeakPoint.IsVulnerable)
+                    continue;
+
+                OctopusBossController boss = bossWeakPoint.Boss;
+                if (boss != null && !processedBosses.Add(boss))
+                    continue;
+
+                if (bossWeakPoint.TryTakeDamage(damage, transform.position))
+                    hitEnemy = true;
+
                 continue;
+            }
 
             if (!processedEnemies.Add(enemyHealth))
                 continue;
@@ -113,9 +136,7 @@ public class PlayerAttackController : MonoBehaviour
             enemyHealth.TakeDamage(damage, transform.position);
 
             if (applyStun)
-            {
                 enemyHealth.ApplyStun(stunDuration);
-            }
         }
 
         return hitEnemy;
