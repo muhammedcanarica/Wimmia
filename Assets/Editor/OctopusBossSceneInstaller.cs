@@ -51,13 +51,15 @@ public static class OctopusBossSceneInstaller
         TentacleSlamAttack slamAttack = EnsureComponent<TentacleSlamAttack>(boss.gameObject);
         SideSweepAttack sideSweepAttack = EnsureComponent<SideSweepAttack>(boss.gameObject);
         OctopusDropAttack dropAttack = EnsureComponent<OctopusDropAttack>(boss.gameObject);
+        OctopusDropSweepComboAttack comboAttack = EnsureComponent<OctopusDropSweepComboAttack>(boss.gameObject);
         Transform[] allSlamPoints = FindAllSlamPoints(boss);
         ValidateSlamPoints(allSlamPoints, boss);
 
-        ConfigureSelector(selector, boss, slamAttack, sideSweepAttack, dropAttack);
+        ConfigureSelector(selector, boss, slamAttack, sideSweepAttack, dropAttack, comboAttack);
         ConfigureSlamAttack(slamAttack, slamPrefab, slamWarningPrefab, allSlamPoints);
         ConfigureSideSweepAttack(sideSweepAttack, sideSweepPrefab, sideSweepWarningPrefab, sweepLeft, sweepRight, new[] { sweepLow, sweepMid, sweepHigh });
         ConfigureDropAttack(dropAttack, dropProjectilePrefab, slamWarningPrefab, allSlamPoints);
+        ConfigureDropSweepCombo(comboAttack, dropAttack, sideSweepAttack);
         DisableLegacyLooseWeakPoints(boss);
 
         EditorUtility.SetDirty(boss.gameObject);
@@ -390,16 +392,38 @@ public static class OctopusBossSceneInstaller
         OctopusBossController boss,
         TentacleSlamAttack slamAttack,
         SideSweepAttack sideSweepAttack,
-        OctopusDropAttack dropAttack)
+        OctopusDropAttack dropAttack,
+        OctopusDropSweepComboAttack comboAttack)
     {
         SerializedObject selectorObject = new SerializedObject(selector);
         SetObject(selectorObject, "boss", boss);
         SetBool(selectorObject, "startLoopOnEnable", true);
-        SetFloat(selectorObject, "attackCooldown", 2f);
-        SetFloat(selectorObject, "phaseTwoAttackCooldown", 1.1f);
+        SetFloat(selectorObject, "initialAttackDelay", 1f);
+        SetFloat(selectorObject, "attackCooldown", 1.4f);
+        SetFloat(selectorObject, "phaseTwoAttackCooldown", 0.7f);
+        SetObject(selectorObject, "phaseTwoComboAttack", comboAttack);
+        SetFloat(selectorObject, "comboChance", 0.2f);
         SetObjectArray(selectorObject, "attacks", new Object[] { slamAttack, sideSweepAttack, dropAttack });
+        SetInt(selectorObject, "maxConsecutiveSameAttack", 2);
+        SetBool(selectorObject, "debugAttackSelection", false);
+        SerializedProperty weightedAttacks = selectorObject.FindProperty("weightedAttacks");
+        weightedAttacks.arraySize = 3;
+        ConfigureWeightedAttackEntry(weightedAttacks.GetArrayElementAtIndex(0), slamAttack, 45f, 35f);
+        ConfigureWeightedAttackEntry(weightedAttacks.GetArrayElementAtIndex(1), sideSweepAttack, 35f, 30f);
+        ConfigureWeightedAttackEntry(weightedAttacks.GetArrayElementAtIndex(2), dropAttack, 20f, 35f);
         selectorObject.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(selector);
+    }
+
+    private static void ConfigureWeightedAttackEntry(
+        SerializedProperty entry,
+        OctopusBossAttack attack,
+        float phaseOneWeight,
+        float phaseTwoWeight)
+    {
+        entry.FindPropertyRelative("attack").objectReferenceValue = attack;
+        entry.FindPropertyRelative("phaseOneWeight").floatValue = phaseOneWeight;
+        entry.FindPropertyRelative("phaseTwoWeight").floatValue = phaseTwoWeight;
     }
 
     private static void ConfigureSlamAttack(TentacleSlamAttack attack, TentacleSlamInstance prefab, GameObject warningPrefab, Transform[] slamPoints)
@@ -408,10 +432,15 @@ public static class OctopusBossSceneInstaller
         SetObject(attackObject, "tentacleSlamPrefab", prefab);
         SetObject(attackObject, "warningIndicatorPrefab", warningPrefab);
         SetObjectArray(attackObject, "slamSpawnPoints", slamPoints);
-        SetFloat(attackObject, "warningDuration", 1.05f);
+        SetFloat(attackObject, "phase1WarningDuration", 0.7f);
+        SetFloat(attackObject, "phase2WarningDuration", 0.5f);
         SetFloat(attackObject, "impactDamageDuration", 0.2f);
-        SetFloat(attackObject, "vulnerableDuration", 2.1f);
-        SetFloat(attackObject, "recoverDuration", 0.65f);
+        SetFloat(attackObject, "phase1VulnerableDuration", 0.9f);
+        SetFloat(attackObject, "phase2VulnerableDuration", 0.7f);
+        SetFloat(attackObject, "phase1RecoverDuration", 0.3f);
+        SetFloat(attackObject, "phase2RecoverDuration", 0.2f);
+        SetFloat(attackObject, "doubleSlamChance", 0.45f);
+        SetFloat(attackObject, "doubleSlamDelay", 0.25f);
         SetInt(attackObject, "playerDamage", 1);
         attackObject.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(attack);
@@ -562,10 +591,11 @@ public static class OctopusBossSceneInstaller
         SetObject(attackObject, "leftStartPoint", leftStart);
         SetObject(attackObject, "rightStartPoint", rightStart);
         SetObjectArray(attackObject, "sweepSpawnPoints", heightPoints);
-        SetFloat(attackObject, "warningDuration", 0.8f);
+        SetFloat(attackObject, "phase1WarningDuration", 0.7f);
+        SetFloat(attackObject, "phase2WarningDuration", 0.5f);
         SetFloat(attackObject, "recoverDuration", 0.15f);
-        SetFloat(attackObject, "sweepSpeed", 13f);
-        SetFloat(attackObject, "phase2SpeedMultiplier", 1.35f);
+        SetFloat(attackObject, "sweepSpeed", 15f);
+        SetFloat(attackObject, "phase2SpeedMultiplier", 1.3f);
         SetBool(attackObject, "randomizeDirection", true);
         SetBool(attackObject, "alternateDirection", true);
         SetBool(attackObject, "startFromLeftFirst", true);
@@ -589,9 +619,10 @@ public static class OctopusBossSceneInstaller
         SetObject(attackObject, "warningIndicatorPrefab", warningPrefab);
         SetObjectArray(attackObject, "targetPoints", targetPoints);
         SetFloat(attackObject, "dropSpawnY", 24f);
-        SetFloat(attackObject, "warningDuration", 0.9f);
-        SetFloat(attackObject, "projectileInterval", 0.35f);
-        SetFloat(attackObject, "phase2ProjectileIntervalMultiplier", 0.65f);
+        SetFloat(attackObject, "phase1WarningDuration", 0.7f);
+        SetFloat(attackObject, "phase2WarningDuration", 0.5f);
+        SetFloat(attackObject, "phase1ProjectileInterval", 0.15f);
+        SetFloat(attackObject, "phase2ProjectileInterval", 0.1f);
         SetInt(attackObject, "phase1ProjectileCount", 3);
         SetInt(attackObject, "phase2ProjectileCount", 5);
         SetInt(attackObject, "phase1NearestPointPoolSize", 5);
@@ -603,6 +634,19 @@ public static class OctopusBossSceneInstaller
         SetFloat(attackObject, "recoverDuration", 0.4f);
         attackObject.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(attack);
+    }
+
+    private static void ConfigureDropSweepCombo(
+        OctopusDropSweepComboAttack combo,
+        OctopusDropAttack dropAttack,
+        SideSweepAttack sideSweepAttack)
+    {
+        SerializedObject comboObject = new SerializedObject(combo);
+        SetObject(comboObject, "dropAttack", dropAttack);
+        SetObject(comboObject, "sideSweepAttack", sideSweepAttack);
+        SetFloat(comboObject, "sideSweepDelayAfterFirstDrop", 0.5f);
+        comboObject.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(combo);
     }
 
     private static void DisableLegacyLooseWeakPoints(OctopusBossController boss)

@@ -17,10 +17,17 @@ public class TentacleSlamAttack : OctopusBossAttack
     [SerializeField] private int phase2NearestPointPoolSize = 2;
 
     [Header("Timing")]
-    [SerializeField] private float warningDuration = 0.8f;
+    [SerializeField] private float phase1WarningDuration = 0.7f;
+    [SerializeField] private float phase2WarningDuration = 0.5f;
     [SerializeField] private float impactDamageDuration = 0.2f;
-    [SerializeField] private float vulnerableDuration = 1.2f;
-    [SerializeField] private float recoverDuration = 0.5f;
+    [SerializeField] private float phase1VulnerableDuration = 0.9f;
+    [SerializeField] private float phase2VulnerableDuration = 0.7f;
+    [SerializeField] private float phase1RecoverDuration = 0.3f;
+    [SerializeField] private float phase2RecoverDuration = 0.2f;
+
+    [Header("Phase 2 Double Slam")]
+    [SerializeField, Range(0f, 1f)] private float doubleSlamChance = 0.45f;
+    [SerializeField] private float doubleSlamDelay = 0.25f;
 
     [Header("Damage")]
     [SerializeField] private int playerDamage = 1;
@@ -48,10 +55,15 @@ public class TentacleSlamAttack : OctopusBossAttack
 
     private void OnValidate()
     {
-        warningDuration = Mathf.Max(0f, warningDuration);
+        phase1WarningDuration = Mathf.Max(0.4f, phase1WarningDuration);
+        phase2WarningDuration = Mathf.Max(0.4f, phase2WarningDuration);
         impactDamageDuration = Mathf.Max(0f, impactDamageDuration);
-        vulnerableDuration = Mathf.Max(0f, vulnerableDuration);
-        recoverDuration = Mathf.Max(0f, recoverDuration);
+        phase1VulnerableDuration = Mathf.Max(0f, phase1VulnerableDuration);
+        phase2VulnerableDuration = Mathf.Max(0f, phase2VulnerableDuration);
+        phase1RecoverDuration = Mathf.Max(0f, phase1RecoverDuration);
+        phase2RecoverDuration = Mathf.Max(0f, phase2RecoverDuration);
+        doubleSlamChance = Mathf.Clamp01(doubleSlamChance);
+        doubleSlamDelay = Mathf.Max(0f, doubleSlamDelay);
         playerDamage = Mathf.Max(1, playerDamage);
         phase1NearestPointPoolSize = Mathf.Max(1, phase1NearestPointPoolSize);
         phase2NearestPointPoolSize = Mathf.Max(1, phase2NearestPointPoolSize);
@@ -68,9 +80,32 @@ public class TentacleSlamAttack : OctopusBossAttack
 
     public override IEnumerator Execute(OctopusBossController boss)
     {
-        Transform slamPoint = SelectSlamPoint(boss);
-        if (boss == null || boss.IsDead || slamPoint == null || tentacleSlamPrefab == null)
+        Transform firstSlamPoint = SelectSlamPoint(boss, null);
+        if (boss == null || boss.IsDead || firstSlamPoint == null || tentacleSlamPrefab == null)
             yield break;
+
+        bool useDoubleSlam = boss.IsPhaseTwo && Random.value < doubleSlamChance;
+        yield return ExecuteSingleSlam(boss, firstSlamPoint);
+
+        if (!useDoubleSlam || boss == null || boss.IsDead)
+            yield break;
+
+        if (doubleSlamDelay > 0f)
+            yield return new WaitForSeconds(doubleSlamDelay);
+
+        if (boss.IsDead)
+            yield break;
+
+        Transform secondSlamPoint = SelectSlamPoint(boss, firstSlamPoint);
+        if (secondSlamPoint != null)
+            yield return ExecuteSingleSlam(boss, secondSlamPoint);
+    }
+
+    private IEnumerator ExecuteSingleSlam(OctopusBossController boss, Transform slamPoint)
+    {
+        float warningDuration = boss.IsPhaseTwo ? phase2WarningDuration : phase1WarningDuration;
+        float vulnerableDuration = boss.IsPhaseTwo ? phase2VulnerableDuration : phase1VulnerableDuration;
+        float recoverDuration = boss.IsPhaseTwo ? phase2RecoverDuration : phase1RecoverDuration;
 
         lockedSlamPosition = slamPoint.position;
         hasLockedSlamPosition = true;
@@ -144,7 +179,7 @@ public class TentacleSlamAttack : OctopusBossAttack
         activeWarning = null;
     }
 
-    private Transform SelectSlamPoint(OctopusBossController boss)
+    private Transform SelectSlamPoint(OctopusBossController boss, Transform excludedPoint)
     {
         if (slamSpawnPoints == null || slamSpawnPoints.Length == 0)
             return null;
@@ -158,9 +193,12 @@ public class TentacleSlamAttack : OctopusBossAttack
         for (int i = 0; i < slamSpawnPoints.Length; i++)
         {
             Transform point = slamSpawnPoints[i];
-            if (point != null)
+            if (point != null && point != excludedPoint)
                 validSlamPoints.Add(point);
         }
+
+        if (validSlamPoints.Count == 0 && excludedPoint != null)
+            validSlamPoints.Add(excludedPoint);
 
         if (validSlamPoints.Count == 0)
             return null;

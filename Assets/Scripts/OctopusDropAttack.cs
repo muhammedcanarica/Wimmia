@@ -18,9 +18,10 @@ public class OctopusDropAttack : OctopusBossAttack
     [Header("Pattern")]
     [SerializeField] private int phase1ProjectileCount = 3;
     [SerializeField] private int phase2ProjectileCount = 5;
-    [SerializeField] private float warningDuration = 0.9f;
-    [SerializeField] private float projectileInterval = 0.35f;
-    [SerializeField] private float phase2ProjectileIntervalMultiplier = 0.65f;
+    [SerializeField] private float phase1WarningDuration = 0.7f;
+    [SerializeField] private float phase2WarningDuration = 0.5f;
+    [SerializeField] private float phase1ProjectileInterval = 0.15f;
+    [SerializeField] private float phase2ProjectileInterval = 0.1f;
     [SerializeField] private float recoverDuration = 0.4f;
 
     [Header("Projectile")]
@@ -52,9 +53,10 @@ public class OctopusDropAttack : OctopusBossAttack
         phase2NearestPointPoolSize = Mathf.Max(1, phase2NearestPointPoolSize);
         phase1ProjectileCount = Mathf.Max(1, phase1ProjectileCount);
         phase2ProjectileCount = Mathf.Max(1, phase2ProjectileCount);
-        warningDuration = Mathf.Max(0f, warningDuration);
-        projectileInterval = Mathf.Max(0f, projectileInterval);
-        phase2ProjectileIntervalMultiplier = Mathf.Clamp(phase2ProjectileIntervalMultiplier, 0.05f, 1f);
+        phase1WarningDuration = Mathf.Max(0.4f, phase1WarningDuration);
+        phase2WarningDuration = Mathf.Max(0.4f, phase2WarningDuration);
+        phase1ProjectileInterval = Mathf.Max(0f, phase1ProjectileInterval);
+        phase2ProjectileInterval = Mathf.Max(0f, phase2ProjectileInterval);
         projectileFallSpeed = Mathf.Max(0.01f, projectileFallSpeed);
         phase2FallSpeedMultiplier = Mathf.Max(0.01f, phase2FallSpeedMultiplier);
         projectileLifetime = Mathf.Max(0.1f, projectileLifetime);
@@ -109,6 +111,7 @@ public class OctopusDropAttack : OctopusBossAttack
                 activeWarnings.Add(warning);
         }
 
+        float warningDuration = GetCurrentWarningDuration(boss);
         if (warningDuration > 0f)
             yield return new WaitForSeconds(warningDuration);
 
@@ -123,9 +126,7 @@ public class OctopusDropAttack : OctopusBossAttack
         float fallSpeed = boss.IsPhaseTwo
             ? projectileFallSpeed * phase2FallSpeedMultiplier
             : projectileFallSpeed;
-        float currentInterval = boss.IsPhaseTwo
-            ? projectileInterval * phase2ProjectileIntervalMultiplier
-            : projectileInterval;
+        float currentInterval = GetCurrentProjectileInterval(boss);
 
         for (int i = 0; i < lockedTargets.Count; i++)
         {
@@ -159,6 +160,20 @@ public class OctopusDropAttack : OctopusBossAttack
             yield return new WaitForSeconds(recoverDuration);
 
         CleanupAttackObjects();
+    }
+
+    public float GetCurrentWarningDuration(OctopusBossController boss)
+    {
+        return boss != null && boss.IsPhaseTwo
+            ? phase2WarningDuration
+            : phase1WarningDuration;
+    }
+
+    public float GetCurrentProjectileInterval(OctopusBossController boss)
+    {
+        return boss != null && boss.IsPhaseTwo
+            ? phase2ProjectileInterval
+            : phase1ProjectileInterval;
     }
 
     private void SelectAndLockTargets(OctopusBossController boss)

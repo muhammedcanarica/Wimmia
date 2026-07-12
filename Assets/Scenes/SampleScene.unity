@@ -7074,6 +7074,7 @@ GameObject:
   - component: {fileID: 378471847}
   - component: {fileID: 378471846}
   - component: {fileID: 378471849}
+  - component: {fileID: 378471850}
   m_Layer: 0
   m_Name: OctopusBoss
   m_TagString: Untagged
@@ -7202,10 +7203,11 @@ MonoBehaviour:
   - {fileID: 328454612}
   - {fileID: 710360738}
   - {fileID: 1806049017}
-  warningDuration: 0.8
+  phase1WarningDuration: 0.7
+  phase2WarningDuration: 0.5
   recoverDuration: 0.15
-  sweepSpeed: 13
-  phase2SpeedMultiplier: 1.35
+  sweepSpeed: 15
+  phase2SpeedMultiplier: 1.3
   randomizeDirection: 1
   alternateDirection: 1
   startFromLeftFirst: 1
@@ -7241,10 +7243,15 @@ MonoBehaviour:
   playerTarget: {fileID: 0}
   phase1NearestPointPoolSize: 3
   phase2NearestPointPoolSize: 2
-  warningDuration: 1.05
+  phase1WarningDuration: 0.7
+  phase2WarningDuration: 0.5
   impactDamageDuration: 0.2
-  vulnerableDuration: 2.1
-  recoverDuration: 0.65
+  phase1VulnerableDuration: 0.9
+  phase2VulnerableDuration: 0.7
+  phase1RecoverDuration: 0.3
+  phase2RecoverDuration: 0.2
+  doubleSlamChance: 0.45
+  doubleSlamDelay: 0.25
   playerDamage: 1
   debugSlamTransforms: 0
   slamPointGizmoRadius: 0.25
@@ -7261,13 +7268,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OctopusBossAttackSelector
   boss: {fileID: 378471844}
+  weightedAttacks:
+  - attack: {fileID: 378471847}
+    phaseOneWeight: 45
+    phaseTwoWeight: 35
+  - attack: {fileID: 378471846}
+    phaseOneWeight: 35
+    phaseTwoWeight: 30
+  - attack: {fileID: 378471849}
+    phaseOneWeight: 20
+    phaseTwoWeight: 35
   attacks:
   - {fileID: 378471847}
   - {fileID: 378471846}
   - {fileID: 378471849}
   startLoopOnEnable: 1
-  attackCooldown: 2
-  phaseTwoAttackCooldown: 1.1
+  initialAttackDelay: 1
+  attackCooldown: 1.4
+  phaseTwoAttackCooldown: 0.7
+  phaseTwoComboAttack: {fileID: 378471850}
+  comboChance: 0.2
+  maxConsecutiveSameAttack: 2
+  debugAttackSelection: 0
 --- !u!114 &378471849
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7298,14 +7320,30 @@ MonoBehaviour:
   phase2NearestPointPoolSize: 7
   phase1ProjectileCount: 3
   phase2ProjectileCount: 5
-  warningDuration: 0.9
-  projectileInterval: 0.35
-  phase2ProjectileIntervalMultiplier: 0.65
+  phase1WarningDuration: 0.7
+  phase2WarningDuration: 0.5
+  phase1ProjectileInterval: 0.15
+  phase2ProjectileInterval: 0.1
   recoverDuration: 0.4
   projectileFallSpeed: 11
   phase2FallSpeedMultiplier: 1.25
   projectileLifetime: 4
   playerDamage: 1
+--- !u!114 &378471850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378471842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b18e7100790c94e4782239be3a7f1c3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OctopusDropSweepComboAttack
+  dropAttack: {fileID: 378471849}
+  sideSweepAttack: {fileID: 378471846}
+  sideSweepDelayAfterFirstDrop: 0.5
 --- !u!1 &416253370
 GameObject:
   m_ObjectHideFlags: 0
@@ -7820,10 +7858,15 @@ MonoBehaviour:
   playerTarget: {fileID: 0}
   phase1NearestPointPoolSize: 3
   phase2NearestPointPoolSize: 2
-  warningDuration: 0.8
+  phase1WarningDuration: 0.7
+  phase2WarningDuration: 0.5
   impactDamageDuration: 0.2
-  vulnerableDuration: 1.2
-  recoverDuration: 0.5
+  phase1VulnerableDuration: 0.9
+  phase2VulnerableDuration: 0.7
+  phase1RecoverDuration: 0.3
+  phase2RecoverDuration: 0.2
+  doubleSlamChance: 0.45
+  doubleSlamDelay: 0.25
   playerDamage: 1
   debugSlamTransforms: 0
   slamPointGizmoRadius: 0.25

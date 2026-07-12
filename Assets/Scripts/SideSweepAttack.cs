@@ -15,12 +15,13 @@ public class SideSweepAttack : OctopusBossAttack
     [SerializeField] private Transform[] sweepSpawnPoints;
 
     [Header("Timing")]
-    [SerializeField] private float warningDuration = 0.8f;
+    [SerializeField] private float phase1WarningDuration = 0.7f;
+    [SerializeField] private float phase2WarningDuration = 0.5f;
     [SerializeField] private float recoverDuration = 0.15f;
 
     [Header("Motion")]
-    [SerializeField] private float sweepSpeed = 13f;
-    [SerializeField] private float phase2SpeedMultiplier = 1.35f;
+    [SerializeField] private float sweepSpeed = 15f;
+    [SerializeField] private float phase2SpeedMultiplier = 1.3f;
     [SerializeField] private bool randomizeDirection = true;
     [SerializeField] private bool alternateDirection = true;
     [SerializeField] private bool startFromLeftFirst = true;
@@ -52,7 +53,8 @@ public class SideSweepAttack : OctopusBossAttack
 
     private void OnValidate()
     {
-        warningDuration = Mathf.Max(0f, warningDuration);
+        phase1WarningDuration = Mathf.Max(0.4f, phase1WarningDuration);
+        phase2WarningDuration = Mathf.Max(0.4f, phase2WarningDuration);
         recoverDuration = Mathf.Max(0f, recoverDuration);
         sweepSpeed = Mathf.Max(0.01f, sweepSpeed);
         phase2SpeedMultiplier = Mathf.Max(0.01f, phase2SpeedMultiplier);
@@ -87,6 +89,7 @@ public class SideSweepAttack : OctopusBossAttack
 
         activeWarning = CreateWarning(startPosition, endPosition);
 
+        float warningDuration = GetCurrentWarningDuration(boss);
         if (warningDuration > 0f)
             yield return new WaitForSeconds(warningDuration);
 
@@ -111,6 +114,13 @@ public class SideSweepAttack : OctopusBossAttack
         }
 
         CleanupActiveSweep();
+    }
+
+    public float GetCurrentWarningDuration(OctopusBossController boss)
+    {
+        return boss != null && boss.IsPhaseTwo
+            ? phase2WarningDuration
+            : phase1WarningDuration;
     }
 
     private void HandleBossDied()

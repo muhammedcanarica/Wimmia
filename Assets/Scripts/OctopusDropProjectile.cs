@@ -156,7 +156,10 @@ public class OctopusDropProjectile : MonoBehaviour
         dropRoutine = null;
 
         if (destroyOnImpact)
+        {
+            gameObject.SetActive(false);
             Destroy(gameObject);
+        }
         else
             gameObject.SetActive(false);
     }
