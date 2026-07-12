@@ -9,7 +9,9 @@ public class Room : MonoBehaviour
     [SerializeField] private BoxCollider2D cameraBounds;
     [SerializeField] private string playerTag = "Player";
     [SerializeField] private bool fitCameraToRoom = true;
+    [SerializeField] private bool showEntireRoom;
     [SerializeField] private Vector2 cameraPadding = Vector2.zero;
+    [SerializeField, Min(0f)] private float arenaTransitionDuration = 0.35f;
     [SerializeField] private float minimumOrthographicSize = 0.1f;
     [SerializeField] private Color activeGizmoFillColor = new Color(1f, 0.9f, 0.1f, 0.16f);
     [SerializeField] private Color activeGizmoOutlineColor = new Color(1f, 0.9f, 0.1f, 1f);
@@ -24,6 +26,8 @@ public class Room : MonoBehaviour
     private float preferredOrthographicSize = -1f;
 
     public CinemachineVirtualCameraBase VirtualCamera => virtualCamera;
+    public bool UsesArenaOverview => fitCameraToRoom && showEntireRoom;
+    public float ArenaTransitionDuration => arenaTransitionDuration;
 
     private void Awake()
     {
@@ -103,11 +107,19 @@ public class Room : MonoBehaviour
 
         float safeAspect = screenAspect > 0.0001f ? screenAspect : GetCurrentScreenAspect();
         Bounds bounds = GetCameraBounds();
-        float targetOrthographicSize = CalculateOrthographicSize(bounds, safeAspect);
+        float targetOrthographicSize = showEntireRoom
+            ? CalculateOverviewOrthographicSize(bounds, safeAspect)
+            : CalculateOrthographicSize(bounds, safeAspect);
 
         LensSettings lens = cinemachineCamera.Lens;
         lens.OrthographicSize = targetOrthographicSize;
         cinemachineCamera.Lens = lens;
+
+        if (showEntireRoom)
+        {
+            AlignCameraToRoomCenter(bounds);
+            return;
+        }
 
         AlignCameraWithinBounds(bounds, ResolveFollowPosition(bounds.center), safeAspect, targetOrthographicSize);
     }
@@ -193,6 +205,17 @@ public class Room : MonoBehaviour
         return Mathf.Min(desiredSize, maxAllowedSize);
     }
 
+    private float CalculateOverviewOrthographicSize(Bounds bounds, float screenAspect)
+    {
+        float horizontalPadding = Mathf.Max(0f, cameraPadding.x);
+        float verticalPadding = Mathf.Max(0f, cameraPadding.y);
+        float paddedWidth = Mathf.Max(0.01f, bounds.size.x + (horizontalPadding * 2f));
+        float paddedHeight = Mathf.Max(0.01f, bounds.size.y + (verticalPadding * 2f));
+        float sizeForWidth = paddedWidth / (2f * Mathf.Max(screenAspect, 0.0001f));
+        float sizeForHeight = paddedHeight * 0.5f;
+        return Mathf.Max(minimumOrthographicSize, sizeForWidth, sizeForHeight);
+    }
+
     private Vector3 ResolveFollowPosition(Vector3 fallbackPosition)
     {
         if (trackedPlayer == null || !trackedPlayer.gameObject.activeInHierarchy)
@@ -223,6 +246,13 @@ public class Room : MonoBehaviour
 
         Vector3 currentPosition = cameraTransform.position;
         cameraTransform.position = new Vector3(targetX, targetY, currentPosition.z);
+    }
+
+    private void AlignCameraToRoomCenter(Bounds bounds)
+    {
+        Transform cameraTransform = virtualCamera.transform;
+        Vector3 currentPosition = cameraTransform.position;
+        cameraTransform.position = new Vector3(bounds.center.x, bounds.center.y, currentPosition.z);
     }
 
     private void OnDrawGizmos()

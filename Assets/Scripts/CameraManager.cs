@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.Cinemachine;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -12,6 +14,10 @@ public class CameraManager : MonoBehaviour
     private Room currentRoom;
     private Room[] rooms;
     private float lastScreenAspect = -1f;
+    private CinemachineBrain cinemachineBrain;
+    private CinemachineBlendDefinition defaultBlend;
+    private Coroutine restoreBlendCoroutine;
+    private bool hasDefaultBlend;
 
     public Room CurrentRoom => currentRoom;
 
@@ -26,6 +32,7 @@ public class CameraManager : MonoBehaviour
 
         Instance = this;
         rooms = FindObjectsByType<Room>(FindObjectsSortMode.None);
+        CacheDefaultBlend();
         DeactivateAllRooms();
         LogDuplicatePlayers();
     }
@@ -45,6 +52,8 @@ public class CameraManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        RestoreDefaultBlend();
+
         if (Instance == this)
         {
             Instance = null;
@@ -87,6 +96,7 @@ public class CameraManager : MonoBehaviour
             currentRoom.SetPriority(inactivePriority);
         }
 
+        PrepareRoomTransition(room);
         room.SetPriority(activePriority);
         room.FitCameraToRoom(Camera.main, currentAspect);
         currentRoom = room;
@@ -108,6 +118,71 @@ public class CameraManager : MonoBehaviour
             }
 
             room.SetPriority(inactivePriority);
+        }
+    }
+
+    private void PrepareRoomTransition(Room destinationRoom)
+    {
+        RestoreDefaultBlend();
+
+        if (destinationRoom == null || !destinationRoom.UsesArenaOverview)
+        {
+            return;
+        }
+
+        CacheDefaultBlend();
+        if (cinemachineBrain == null || !hasDefaultBlend)
+        {
+            return;
+        }
+
+        cinemachineBrain.DefaultBlend = new CinemachineBlendDefinition(
+            CinemachineBlendDefinition.Styles.EaseInOut,
+            destinationRoom.ArenaTransitionDuration);
+        restoreBlendCoroutine = StartCoroutine(RestoreDefaultBlendAfterCameraUpdate());
+    }
+
+    private IEnumerator RestoreDefaultBlendAfterCameraUpdate()
+    {
+        yield return new WaitForEndOfFrame();
+
+        if (cinemachineBrain != null && hasDefaultBlend)
+        {
+            cinemachineBrain.DefaultBlend = defaultBlend;
+        }
+
+        restoreBlendCoroutine = null;
+    }
+
+    private void CacheDefaultBlend()
+    {
+        if (hasDefaultBlend)
+        {
+            return;
+        }
+
+        Camera mainCamera = Camera.main;
+        cinemachineBrain = mainCamera != null ? mainCamera.GetComponent<CinemachineBrain>() : null;
+        if (cinemachineBrain == null)
+        {
+            return;
+        }
+
+        defaultBlend = cinemachineBrain.DefaultBlend;
+        hasDefaultBlend = true;
+    }
+
+    private void RestoreDefaultBlend()
+    {
+        if (restoreBlendCoroutine != null)
+        {
+            StopCoroutine(restoreBlendCoroutine);
+            restoreBlendCoroutine = null;
+        }
+
+        if (cinemachineBrain != null && hasDefaultBlend)
+        {
+            cinemachineBrain.DefaultBlend = defaultBlend;
         }
     }
 

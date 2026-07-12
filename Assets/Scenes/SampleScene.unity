@@ -2221,7 +2221,7 @@ GameObject:
   - component: {fileID: 237192466}
   - component: {fileID: 237192465}
   m_Layer: 0
-  m_Name: Room1 Cinemachine
+  m_Name: Room5 Boss Cinemachine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2252,7 +2252,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 34
-    OrthographicSize: 8.649724
+    OrthographicSize: 10.5
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -14841,7 +14841,9 @@ MonoBehaviour:
   cameraBounds: {fileID: 752961252}
   playerTag: Player
   fitCameraToRoom: 1
+  showEntireRoom: 0
   cameraPadding: {x: 0, y: 0}
+  arenaTransitionDuration: 0.35
   minimumOrthographicSize: 0.1
   activeGizmoFillColor: {r: 1, g: 0.9, b: 0.1, a: 0.16}
   activeGizmoOutlineColor: {r: 1, g: 0.9, b: 0.1, a: 1}
@@ -25084,7 +25086,9 @@ MonoBehaviour:
   cameraBounds: {fileID: 1596274456}
   playerTag: Player
   fitCameraToRoom: 1
+  showEntireRoom: 0
   cameraPadding: {x: 0, y: 0}
+  arenaTransitionDuration: 0.35
   minimumOrthographicSize: 0.1
   activeGizmoFillColor: {r: 1, g: 0.9, b: 0.1, a: 0.16}
   activeGizmoOutlineColor: {r: 1, g: 0.9, b: 0.1, a: 1}
@@ -28232,7 +28236,9 @@ MonoBehaviour:
   cameraBounds: {fileID: 256808180}
   playerTag: Player
   fitCameraToRoom: 1
-  cameraPadding: {x: 0, y: 0}
+  showEntireRoom: 1
+  cameraPadding: {x: 0.5, y: 0.5}
+  arenaTransitionDuration: 0.35
   minimumOrthographicSize: 0.1
   activeGizmoFillColor: {r: 1, g: 0.9, b: 0.1, a: 0.16}
   activeGizmoOutlineColor: {r: 1, g: 0.9, b: 0.1, a: 1}
@@ -28274,7 +28280,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 13.5, y: -0.5}
+  m_Offset: {x: 14, y: -0.5}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -28284,7 +28290,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 38, y: 20}
+  m_Size: {x: 39, y: 20}
   m_EdgeRadius: 0
 --- !u!4 &1309635831
 Transform:
@@ -28569,7 +28575,9 @@ MonoBehaviour:
   cameraBounds: {fileID: 607633670}
   playerTag: Player
   fitCameraToRoom: 1
+  showEntireRoom: 0
   cameraPadding: {x: 0, y: 0}
+  arenaTransitionDuration: 0.35
   minimumOrthographicSize: 0.1
   activeGizmoFillColor: {r: 1, g: 0.9, b: 0.1, a: 0.16}
   activeGizmoOutlineColor: {r: 1, g: 0.9, b: 0.1, a: 1}
@@ -36323,7 +36331,9 @@ MonoBehaviour:
   cameraBounds: {fileID: 517597571}
   playerTag: Player
   fitCameraToRoom: 1
+  showEntireRoom: 0
   cameraPadding: {x: 0, y: 0}
+  arenaTransitionDuration: 0.35
   minimumOrthographicSize: 0.1
   activeGizmoFillColor: {r: 1, g: 0.9, b: 0.1, a: 0.16}
   activeGizmoOutlineColor: {r: 1, g: 0.9, b: 0.1, a: 1}
