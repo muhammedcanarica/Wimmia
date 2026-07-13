@@ -95,16 +95,6 @@ Wimmia is an active gameplay prototype. Some systems are complete enough to test
 - Playtesting and balance adjustments
 - Gameplay video and downloadable build
 
-### Media
-
-Add gameplay screenshots or a GIF here:
-
-```md
-![Wimmia gameplay](docs/wimmia-gameplay.gif)
-```
-
----
-
 ## Türkçe
 
 ### Genel Bakış
@@ -193,10 +183,3 @@ Wimmia aktif olarak geliştirilen bir gameplay prototipidir. Bazı sistemler tes
 - Oynanış testleri ve denge ayarları
 - Gameplay videosu ve indirilebilir build
 
-### Medya
-
-Buraya gameplay ekran görüntüsü veya GIF eklenebilir:
-
-```md
-![Wimmia gameplay](docs/wimmia-gameplay.gif)
-```
