@@ -88,6 +88,11 @@ public class OctopusDropAttack : OctopusBossAttack
         return configured;
     }
 
+    public override void CancelActiveAttack()
+    {
+        CleanupAttackObjects();
+    }
+
     public override IEnumerator Execute(OctopusBossController boss)
     {
         if (boss == null || boss.IsDead || dropProjectilePrefab == null || warningIndicatorPrefab == null)

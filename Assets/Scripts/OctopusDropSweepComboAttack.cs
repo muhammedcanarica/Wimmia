@@ -35,6 +35,13 @@ public class OctopusDropSweepComboAttack : OctopusBossAttack
             sideSweepAttack.CanUse(boss);
     }
 
+    public override void CancelActiveAttack()
+    {
+        dropAttack?.CancelActiveAttack();
+        sideSweepAttack?.CancelActiveAttack();
+        CleanupCombo();
+    }
+
     public override IEnumerator Execute(OctopusBossController boss)
     {
         if (!CanUse(boss))

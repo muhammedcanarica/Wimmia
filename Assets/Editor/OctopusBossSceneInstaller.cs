@@ -12,12 +12,20 @@ public static class OctopusBossSceneInstaller
     private const string SlamTentaclePrefabPath = BossPrefabFolder + "/OctopusTentacleSlam.prefab";
     private const string SideSweepPrefabPath = BossPrefabFolder + "/OctopusSideSweep.prefab";
     private const string DropProjectilePrefabPath = BossPrefabFolder + "/OctopusDropProjectile.prefab";
+    private const string SlowFieldPrefabPath = BossPrefabFolder + "/OctopusSlowField.prefab";
+    private const string SlowFieldWarningPrefabPath = BossPrefabFolder + "/OctopusSlowFieldWarning.prefab";
+    private const string NoteProjectilePrefabPath = BossPrefabFolder + "/OctopusNoteProjectile.prefab";
+    private const string SlowFieldWeakPointPrefabPath = BossPrefabFolder + "/OctopusSlowFieldWeakPoint.prefab";
     private const string SlamWarningPrefabPath = BossPrefabFolder + "/OctopusSlamWarning.prefab";
     private const string SideSweepWarningPrefabPath = BossPrefabFolder + "/OctopusSideSweepWarning.prefab";
     private const string TentacleSpritePath = GeneratedFolder + "/OctopusTentaclePlaceholder.png";
     private const string SlamWarningSpritePath = GeneratedFolder + "/OctopusSlamWarningSprite.png";
     private const string SideSweepWarningSpritePath = GeneratedFolder + "/OctopusSideSweepWarningSprite.png";
     private const string DropProjectileSpritePath = GeneratedFolder + "/OctopusDropProjectileSprite.png";
+    private const string SlowFieldSpritePath = GeneratedFolder + "/OctopusSlowFieldSprite.png";
+    private const string SlowFieldWarningSpritePath = GeneratedFolder + "/OctopusSlowFieldWarningSprite.png";
+    private const string NoteProjectileSpritePath = GeneratedFolder + "/OctopusNoteProjectileSprite.png";
+    private const string SlowFieldWeakPointSpritePath = GeneratedFolder + "/OctopusSlowFieldWeakPointSprite.png";
 
     [MenuItem("Tools/Octopus Boss/Install Boss Setup")]
     public static void InstallBossSetup()
@@ -28,12 +36,26 @@ public static class OctopusBossSceneInstaller
         Sprite slamWarningSprite = EnsureSprite(SlamWarningSpritePath, new Color32(255, 36, 16, 230), 48, 10, 16f);
         Sprite sideSweepWarningSprite = EnsureSprite(SideSweepWarningSpritePath, new Color32(255, 54, 54, 135), 32, 6, 16f);
         Sprite dropProjectileSprite = EnsureSprite(DropProjectileSpritePath, new Color32(167, 73, 214, 255), 20, 20, 16f);
+        Sprite slowFieldSprite = EnsureSprite(SlowFieldSpritePath, new Color32(95, 80, 220, 115), 16, 16, 16f);
+        Sprite slowFieldWarningSprite = EnsureSprite(SlowFieldWarningSpritePath, new Color32(255, 208, 70, 130), 16, 16, 16f);
+        Sprite noteProjectileSprite = EnsureSprite(NoteProjectileSpritePath, new Color32(255, 105, 210, 255), 16, 16, 16f);
+        Sprite slowFieldWeakPointSprite = EnsureSprite(SlowFieldWeakPointSpritePath, new Color32(255, 190, 245, 255), 16, 16, 16f);
 
         TentacleSlamInstance slamPrefab = EnsureSlamTentaclePrefab(tentacleSprite);
         SideSweepInstance sideSweepPrefab = EnsureSideSweepPrefab(tentacleSprite);
         OctopusDropProjectile dropProjectilePrefab = EnsureDropProjectilePrefab(dropProjectileSprite);
+        OctopusSlowFieldZone slowFieldPrefab = EnsureSlowFieldPrefab(slowFieldSprite);
+        OctopusNoteProjectile noteProjectilePrefab = EnsureNoteProjectilePrefab(noteProjectileSprite);
+        BossWeakPoint slowFieldWeakPointPrefab = EnsureSlowFieldWeakPointPrefab(slowFieldWeakPointSprite);
         GameObject slamWarningPrefab = EnsureWarningPrefab(SlamWarningPrefabPath, slamWarningSprite, "OctopusSlamWarning", new Vector3(1.8f, 1.4f, 1f), 100, new Color(1f, 0.2f, 0.05f, 0.9f));
         GameObject sideSweepWarningPrefab = EnsureWarningPrefab(SideSweepWarningPrefabPath, sideSweepWarningSprite, "OctopusSideSweepWarning", Vector3.one);
+        GameObject slowFieldWarningPrefab = EnsureWarningPrefab(
+            SlowFieldWarningPrefabPath,
+            slowFieldWarningSprite,
+            "OctopusSlowFieldWarning",
+            Vector3.one,
+            18,
+            new Color(1f, 0.82f, 0.25f, 0.5f));
 
         OctopusBossController boss = FindOrCreateBoss();
         ConfigureBossSprites(boss);
@@ -46,20 +68,32 @@ public static class OctopusBossSceneInstaller
         Transform sweepLow = EnsureChild(setupRoot, "SweepHeight_Low", new Vector3(0f, -4.2f, 0f));
         Transform sweepMid = EnsureChild(setupRoot, "SweepHeight_Mid", new Vector3(0f, -2.2f, 0f));
         Transform sweepHigh = EnsureChild(setupRoot, "SweepHeight_High", new Vector3(0f, -0.2f, 0f));
+        Transform noteSpawnLeft = EnsureChild(setupRoot, "NoteSpawn_Left", new Vector3(-2.2f, 2.2f, 0f));
+        Transform noteSpawnCenter = EnsureChild(setupRoot, "NoteSpawn_Center", new Vector3(0f, 2.8f, 0f));
+        Transform noteSpawnRight = EnsureChild(setupRoot, "NoteSpawn_Right", new Vector3(2.2f, 2.2f, 0f));
 
         OctopusBossAttackSelector selector = EnsureComponent<OctopusBossAttackSelector>(boss.gameObject);
         TentacleSlamAttack slamAttack = EnsureComponent<TentacleSlamAttack>(boss.gameObject);
         SideSweepAttack sideSweepAttack = EnsureComponent<SideSweepAttack>(boss.gameObject);
         OctopusDropAttack dropAttack = EnsureComponent<OctopusDropAttack>(boss.gameObject);
+        OctopusSlowFieldAttack slowFieldAttack = EnsureComponent<OctopusSlowFieldAttack>(boss.gameObject);
         OctopusDropSweepComboAttack comboAttack = EnsureComponent<OctopusDropSweepComboAttack>(boss.gameObject);
         Transform[] allSlamPoints = FindAllSlamPoints(boss);
         ValidateSlamPoints(allSlamPoints, boss);
 
-        ConfigureSelector(selector, boss, slamAttack, sideSweepAttack, dropAttack, comboAttack);
+        ConfigureSelector(selector, boss, slamAttack, sideSweepAttack, dropAttack, slowFieldAttack, comboAttack);
         ConfigureSlamAttack(slamAttack, slamPrefab, slamWarningPrefab, allSlamPoints);
         ConfigureSideSweepAttack(sideSweepAttack, sideSweepPrefab, sideSweepWarningPrefab, sweepLeft, sweepRight, new[] { sweepLow, sweepMid, sweepHigh });
         ConfigureDropAttack(dropAttack, dropProjectilePrefab, slamWarningPrefab, allSlamPoints);
+        ConfigureSlowFieldAttack(
+            slowFieldAttack,
+            slowFieldPrefab,
+            slowFieldWarningPrefab,
+            noteProjectilePrefab,
+            slowFieldWeakPointPrefab,
+            new[] { noteSpawnLeft, noteSpawnCenter, noteSpawnRight });
         ConfigureDropSweepCombo(comboAttack, dropAttack, sideSweepAttack);
+        ConfigureRoom5Encounter(boss, selector);
         DisableLegacyLooseWeakPoints(boss);
 
         EditorUtility.SetDirty(boss.gameObject);
@@ -68,7 +102,7 @@ public static class OctopusBossSceneInstaller
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        Debug.Log("Octopus boss setup installed: Tentacle Slam, Side Sweep, Drop Attack, prefabs, warnings, and spawn points are wired.", boss);
+        Debug.Log("Octopus boss setup installed: attacks, Room5 encounter flow, doors, prefabs, warnings, and spawn points are wired.", boss);
     }
 
     [MenuItem("Tools/Octopus Boss/Validate Slam Points")]
@@ -268,6 +302,112 @@ public static class OctopusBossSceneInstaller
         EditorUtility.SetDirty(projectile);
     }
 
+    private static OctopusSlowFieldZone EnsureSlowFieldPrefab(Sprite sprite)
+    {
+        GameObject existing = AssetDatabase.LoadAssetAtPath<GameObject>(SlowFieldPrefabPath);
+        if (existing != null)
+            return existing.GetComponent<OctopusSlowFieldZone>();
+
+        GameObject root = new GameObject("OctopusSlowField");
+        BoxCollider2D collider = root.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+        collider.size = new Vector2(6f, 2.4f);
+
+        GameObject visualObject = new GameObject("FieldVisual");
+        visualObject.transform.SetParent(root.transform, false);
+        SpriteRenderer renderer = visualObject.AddComponent<SpriteRenderer>();
+        renderer.sprite = sprite;
+        renderer.color = new Color(0.45f, 0.35f, 1f, 0.45f);
+        renderer.sortingOrder = 7;
+
+        OctopusSlowFieldZone zone = root.AddComponent<OctopusSlowFieldZone>();
+        SerializedObject zoneObject = new SerializedObject(zone);
+        SetObject(zoneObject, "fieldCollider", collider);
+        SetObject(zoneObject, "fieldVisual", renderer);
+        zoneObject.ApplyModifiedPropertiesWithoutUndo();
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, SlowFieldPrefabPath);
+        Object.DestroyImmediate(root);
+        return prefab.GetComponent<OctopusSlowFieldZone>();
+    }
+
+    private static OctopusNoteProjectile EnsureNoteProjectilePrefab(Sprite sprite)
+    {
+        GameObject existing = AssetDatabase.LoadAssetAtPath<GameObject>(NoteProjectilePrefabPath);
+        if (existing != null)
+            return existing.GetComponent<OctopusNoteProjectile>();
+
+        GameObject root = new GameObject("OctopusNoteProjectile");
+        SpriteRenderer renderer = root.AddComponent<SpriteRenderer>();
+        renderer.sprite = sprite;
+        renderer.color = new Color(1f, 0.45f, 0.9f, 1f);
+        renderer.sortingOrder = 11;
+        root.transform.localScale = new Vector3(0.55f, 0.55f, 1f);
+
+        CircleCollider2D collider = root.AddComponent<CircleCollider2D>();
+        collider.isTrigger = true;
+        collider.radius = 0.45f;
+
+        Rigidbody2D body = root.AddComponent<Rigidbody2D>();
+        body.bodyType = RigidbodyType2D.Kinematic;
+        body.gravityScale = 0f;
+        body.freezeRotation = true;
+        body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+
+        OctopusNoteProjectile projectile = root.AddComponent<OctopusNoteProjectile>();
+        SerializedObject projectileObject = new SerializedObject(projectile);
+        SetObject(projectileObject, "body", body);
+        SetObject(projectileObject, "damageHitbox", collider);
+        projectileObject.ApplyModifiedPropertiesWithoutUndo();
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, NoteProjectilePrefabPath);
+        Object.DestroyImmediate(root);
+        return prefab.GetComponent<OctopusNoteProjectile>();
+    }
+
+    private static BossWeakPoint EnsureSlowFieldWeakPointPrefab(Sprite sprite)
+    {
+        GameObject existing = AssetDatabase.LoadAssetAtPath<GameObject>(SlowFieldWeakPointPrefabPath);
+        if (existing != null)
+            return existing.GetComponent<BossWeakPoint>();
+
+        GameObject root = new GameObject("OctopusSlowFieldWeakPoint");
+        CircleCollider2D collider = root.AddComponent<CircleCollider2D>();
+        collider.isTrigger = true;
+        collider.radius = 0.65f;
+
+        GameObject visualObject = new GameObject("WeakPointVisual");
+        visualObject.transform.SetParent(root.transform, false);
+        SpriteRenderer renderer = visualObject.AddComponent<SpriteRenderer>();
+        renderer.sprite = sprite;
+        renderer.color = new Color(1f, 0.65f, 0.95f, 1f);
+        renderer.sortingOrder = 12;
+        visualObject.transform.localScale = new Vector3(0.85f, 0.85f, 1f);
+
+        BossWeakPoint weakPoint = root.AddComponent<BossWeakPoint>();
+        GameObject hitParticleObject = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/HitImpact_Particle.prefab");
+        ParticleSystem hitParticle = hitParticleObject != null
+            ? hitParticleObject.GetComponent<ParticleSystem>()
+            : null;
+        SerializedObject weakPointObject = new SerializedObject(weakPoint);
+        SetBool(weakPointObject, "isVulnerable", false);
+        SetInt(weakPointObject, "damageMultiplier", 1);
+        SetObject(weakPointObject, "weakPointVisual", renderer);
+        SetColor(weakPointObject, "inactiveColor", new Color(0.45f, 0.25f, 0.55f, 0.18f));
+        SetColor(weakPointObject, "vulnerableColor", new Color(1f, 0.45f, 0.9f, 1f));
+        SetFloat(weakPointObject, "pulseScaleMultiplier", 1.12f);
+        SetFloat(weakPointObject, "pulseSpeed", 2.5f);
+        SetObject(weakPointObject, "hitParticlePrefab", hitParticle);
+        SetFloat(weakPointObject, "hitFlashDuration", 0.14f);
+        SetBool(weakPointObject, "hideVisualWhenInactive", true);
+        weakPointObject.ApplyModifiedPropertiesWithoutUndo();
+
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, SlowFieldWeakPointPrefabPath);
+        Object.DestroyImmediate(root);
+        return prefab.GetComponent<BossWeakPoint>();
+    }
+
     private static GameObject EnsureWarningPrefab(string path, Sprite sprite, string name, Vector3 scale)
     {
         return EnsureWarningPrefab(path, sprite, name, scale, 20, Color.white);
@@ -387,30 +527,148 @@ public static class OctopusBossSceneInstaller
         return component;
     }
 
+    private static void ConfigureRoom5Encounter(
+        OctopusBossController boss,
+        OctopusBossAttackSelector selector)
+    {
+        Room room5 = boss != null ? boss.GetComponentInParent<Room>() : null;
+        if (room5 == null)
+        {
+            Debug.LogWarning("Octopus encounter setup could not find the Room component containing the boss.", boss);
+            return;
+        }
+
+        Room5EnterTrigger cameraTrigger = room5.GetComponentInChildren<Room5EnterTrigger>(true);
+        if (cameraTrigger == null)
+        {
+            Debug.LogWarning("Octopus encounter setup could not find a Room5EnterTrigger under Room5.", room5);
+            return;
+        }
+
+        Collider2D encounterTrigger = cameraTrigger.GetComponent<Collider2D>();
+        if (encounterTrigger == null)
+        {
+            BoxCollider2D createdTrigger = cameraTrigger.gameObject.AddComponent<BoxCollider2D>();
+            createdTrigger.size = new Vector2(2f, 8f);
+            encounterTrigger = createdTrigger;
+        }
+
+        encounterTrigger.isTrigger = true;
+
+        BoxCollider2D roomCollider = room5.GetComponent<BoxCollider2D>();
+        Bounds roomBounds = roomCollider != null
+            ? roomCollider.bounds
+            : new Bounds(room5.transform.position, new Vector3(40f, 20f, 0f));
+        Bounds triggerBounds = encounterTrigger.bounds;
+        float doorHeight = Mathf.Max(2f, triggerBounds.size.y);
+        float doorY = triggerBounds.center.y;
+
+        Door entranceDoor = EnsureEncounterDoor(
+            room5.transform,
+            "BossEntranceDoor",
+            new Vector3(roomBounds.min.x + 0.25f, doorY, 0f),
+            new Vector2(0.5f, doorHeight),
+            true);
+        Door exitDoor = EnsureEncounterDoor(
+            room5.transform,
+            "BossExitDoor",
+            new Vector3(roomBounds.max.x - 0.25f, doorY, 0f),
+            new Vector2(0.5f, doorHeight),
+            false);
+
+        AudioSource musicSource = EnsureComponent<AudioSource>(cameraTrigger.gameObject);
+        musicSource.playOnAwake = false;
+        musicSource.loop = false;
+        musicSource.spatialBlend = 0f;
+
+        PlayerController player = Object.FindFirstObjectByType<PlayerController>();
+        int playerLayerMask = player != null ? 1 << player.gameObject.layer : 1;
+
+        Room5BossEncounterController encounter = EnsureComponent<Room5BossEncounterController>(cameraTrigger.gameObject);
+        SerializedObject encounterObject = new SerializedObject(encounter);
+        SetObject(encounterObject, "bossController", boss);
+        SetObject(encounterObject, "attackSelector", selector);
+        SetObject(encounterObject, "encounterTrigger", encounterTrigger);
+        SetInt(encounterObject, "playerLayer", playerLayerMask);
+        SetObject(encounterObject, "entranceDoor", entranceDoor);
+        SetObject(encounterObject, "exitDoor", exitDoor);
+        SetObject(encounterObject, "room5Camera", cameraTrigger);
+        SetFloat(encounterObject, "introDelay", 1.25f);
+        SetFloat(encounterObject, "deathDelay", 1.25f);
+        SetObject(encounterObject, "bossMusicSource", musicSource);
+        SetObject(encounterObject, "bossMusicClip", null);
+        SetObject(encounterObject, "victoryMusicClip", null);
+        SetObject(encounterObject, "bossHealthBar", null);
+        SetBool(encounterObject, "startOnlyOnce", true);
+        encounterObject.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(encounter);
+        EditorUtility.SetDirty(cameraTrigger.gameObject);
+    }
+
+    private static Door EnsureEncounterDoor(
+        Transform roomRoot,
+        string doorName,
+        Vector3 worldPosition,
+        Vector2 colliderSize,
+        bool startOpen)
+    {
+        Transform doorTransform = roomRoot.Find(doorName);
+        if (doorTransform == null)
+        {
+            GameObject doorObject = new GameObject(doorName);
+            doorTransform = doorObject.transform;
+            doorTransform.SetParent(roomRoot, false);
+        }
+
+        doorTransform.position = worldPosition;
+        doorTransform.rotation = Quaternion.identity;
+        doorTransform.localScale = Vector3.one;
+
+        BoxCollider2D blockingCollider = EnsureComponent<BoxCollider2D>(doorTransform.gameObject);
+        blockingCollider.isTrigger = false;
+        blockingCollider.size = colliderSize;
+        blockingCollider.offset = Vector2.zero;
+        blockingCollider.enabled = !startOpen;
+
+        Door door = EnsureComponent<Door>(doorTransform.gameObject);
+        SerializedObject doorObjectSerialized = new SerializedObject(door);
+        SetObject(doorObjectSerialized, "blockingCollider", blockingCollider);
+        SetObject(doorObjectSerialized, "animator", null);
+        SetBool(doorObjectSerialized, "startOpen", startOpen);
+        doorObjectSerialized.ApplyModifiedPropertiesWithoutUndo();
+
+        EditorUtility.SetDirty(blockingCollider);
+        EditorUtility.SetDirty(door);
+        EditorUtility.SetDirty(doorTransform);
+        return door;
+    }
+
     private static void ConfigureSelector(
         OctopusBossAttackSelector selector,
         OctopusBossController boss,
         TentacleSlamAttack slamAttack,
         SideSweepAttack sideSweepAttack,
         OctopusDropAttack dropAttack,
+        OctopusSlowFieldAttack slowFieldAttack,
         OctopusDropSweepComboAttack comboAttack)
     {
         SerializedObject selectorObject = new SerializedObject(selector);
         SetObject(selectorObject, "boss", boss);
-        SetBool(selectorObject, "startLoopOnEnable", true);
-        SetFloat(selectorObject, "initialAttackDelay", 1f);
+        SetBool(selectorObject, "startLoopOnEnable", false);
+        SetFloat(selectorObject, "initialAttackDelay", 0f);
         SetFloat(selectorObject, "attackCooldown", 1.4f);
         SetFloat(selectorObject, "phaseTwoAttackCooldown", 0.7f);
         SetObject(selectorObject, "phaseTwoComboAttack", comboAttack);
         SetFloat(selectorObject, "comboChance", 0.2f);
-        SetObjectArray(selectorObject, "attacks", new Object[] { slamAttack, sideSweepAttack, dropAttack });
+        SetObjectArray(selectorObject, "attacks", new Object[] { slamAttack, sideSweepAttack, dropAttack, slowFieldAttack });
         SetInt(selectorObject, "maxConsecutiveSameAttack", 2);
         SetBool(selectorObject, "debugAttackSelection", false);
         SerializedProperty weightedAttacks = selectorObject.FindProperty("weightedAttacks");
-        weightedAttacks.arraySize = 3;
+        weightedAttacks.arraySize = 4;
         ConfigureWeightedAttackEntry(weightedAttacks.GetArrayElementAtIndex(0), slamAttack, 45f, 35f);
         ConfigureWeightedAttackEntry(weightedAttacks.GetArrayElementAtIndex(1), sideSweepAttack, 35f, 30f);
         ConfigureWeightedAttackEntry(weightedAttacks.GetArrayElementAtIndex(2), dropAttack, 20f, 35f);
+        ConfigureWeightedAttackEntry(weightedAttacks.GetArrayElementAtIndex(3), slowFieldAttack, 12f, 22f);
         selectorObject.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(selector);
     }
@@ -636,6 +894,49 @@ public static class OctopusBossSceneInstaller
         EditorUtility.SetDirty(attack);
     }
 
+    private static void ConfigureSlowFieldAttack(
+        OctopusSlowFieldAttack attack,
+        OctopusSlowFieldZone slowFieldPrefab,
+        GameObject warningPrefab,
+        OctopusNoteProjectile noteProjectilePrefab,
+        BossWeakPoint weakPointPrefab,
+        Transform[] noteSpawnPoints)
+    {
+        PlayerController player = Object.FindFirstObjectByType<PlayerController>();
+        SerializedObject attackObject = new SerializedObject(attack);
+        SetObject(attackObject, "slowFieldPrefab", slowFieldPrefab);
+        SetObject(attackObject, "slowFieldWarningPrefab", warningPrefab);
+        SetObject(attackObject, "noteProjectilePrefab", noteProjectilePrefab);
+        SetObject(attackObject, "weakPointPrefab", weakPointPrefab);
+        SetObject(attackObject, "playerTarget", player != null ? player.transform : null);
+        SetObjectArray(attackObject, "noteSpawnPoints", noteSpawnPoints);
+        SetInt(attackObject, "groundLayerMask", 1 << 6);
+        SetFloat(attackObject, "groundProbeHeight", 8f);
+        SetVector2(attackObject, "fieldSize", new Vector2(6f, 2.4f));
+        SetFloat(attackObject, "warningDurationPhase1", 0.8f);
+        SetFloat(attackObject, "warningDurationPhase2", 0.55f);
+        SetFloat(attackObject, "fieldDurationPhase1", 3.2f);
+        SetFloat(attackObject, "fieldDurationPhase2", 3.8f);
+        SetFloat(attackObject, "movementMultiplierPhase1", 0.65f);
+        SetFloat(attackObject, "movementMultiplierPhase2", 0.5f);
+        SetInt(attackObject, "noteWaveCountPhase1", 3);
+        SetInt(attackObject, "noteWaveCountPhase2", 4);
+        SetInt(attackObject, "notesPerWavePhase1", 2);
+        SetInt(attackObject, "notesPerWavePhase2", 3);
+        SetFloat(attackObject, "waveIntervalPhase1", 0.65f);
+        SetFloat(attackObject, "waveIntervalPhase2", 0.45f);
+        SetFloat(attackObject, "noteSpreadAngle", 14f);
+        SetFloat(attackObject, "noteProjectileSpeed", 8.5f);
+        SetFloat(attackObject, "phase2ProjectileSpeedMultiplier", 1.2f);
+        SetFloat(attackObject, "projectileLifetime", 4f);
+        SetInt(attackObject, "playerDamage", 1);
+        SetFloat(attackObject, "vulnerableDurationPhase1", 1f);
+        SetFloat(attackObject, "vulnerableDurationPhase2", 0.8f);
+        SetFloat(attackObject, "recoverDuration", 0.4f);
+        attackObject.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(attack);
+    }
+
     private static void ConfigureDropSweepCombo(
         OctopusDropSweepComboAttack combo,
         OctopusDropAttack dropAttack,
@@ -725,6 +1026,13 @@ public static class OctopusBossSceneInstaller
         SerializedProperty property = serializedObject.FindProperty(propertyName);
         if (property != null)
             property.boolValue = value;
+    }
+
+    private static void SetColor(SerializedObject serializedObject, string propertyName, Color value)
+    {
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+        if (property != null)
+            property.colorValue = value;
     }
 
     private static void SetVector2(SerializedObject serializedObject, string propertyName, Vector2 value)

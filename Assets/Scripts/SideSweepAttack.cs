@@ -73,6 +73,11 @@ public class SideSweepAttack : OctopusBossAttack
             rightStartPoint != null;
     }
 
+    public override void CancelActiveAttack()
+    {
+        CleanupActiveSweep();
+    }
+
     public override IEnumerator Execute(OctopusBossController boss)
     {
         if (boss == null || boss.IsDead || sideSweepPrefab == null || leftStartPoint == null || rightStartPoint == null)

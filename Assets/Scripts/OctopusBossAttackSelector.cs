@@ -50,6 +50,7 @@ public class OctopusBossAttackSelector : MonoBehaviour
     private readonly HashSet<OctopusBossAttack> processedAttacks = new HashSet<OctopusBossAttack>();
     private Coroutine loopRoutine;
     private bool isAttackRunning;
+    private OctopusBossAttack currentAttack;
     private OctopusBossAttack lastSelectedAttack;
     private int consecutiveSameAttackCount;
 
@@ -66,6 +67,8 @@ public class OctopusBossAttackSelector : MonoBehaviour
     }
 
     public bool IsAttackRunning => isAttackRunning;
+    public bool IsLoopRunning => loopRoutine != null;
+    public OctopusBossAttack CurrentAttack => currentAttack;
 
     private void Reset()
     {
@@ -131,6 +134,18 @@ public class OctopusBossAttackSelector : MonoBehaviour
         isAttackRunning = false;
     }
 
+    public void StopLoopAndCleanupActiveAttacks()
+    {
+        StopLoop();
+
+        OctopusBossAttack[] attachedAttacks = GetComponents<OctopusBossAttack>();
+        for (int i = 0; i < attachedAttacks.Length; i++)
+            attachedAttacks[i]?.CancelActiveAttack();
+
+        currentAttack = null;
+        isAttackRunning = false;
+    }
+
     private IEnumerator AttackLoopRoutine()
     {
         if (initialAttackDelay > 0f)
@@ -152,7 +167,9 @@ public class OctopusBossAttackSelector : MonoBehaviour
 
             RegisterSelection(selectedCandidate);
             isAttackRunning = true;
-            yield return selectedCandidate.Attack.Execute(boss);
+            currentAttack = selectedCandidate.Attack;
+            yield return currentAttack.Execute(boss);
+            currentAttack = null;
             isAttackRunning = false;
 
             if (boss != null && !boss.IsDead)
@@ -167,6 +184,7 @@ public class OctopusBossAttackSelector : MonoBehaviour
         }
 
         loopRoutine = null;
+        currentAttack = null;
         isAttackRunning = false;
     }
 
@@ -223,9 +241,7 @@ public class OctopusBossAttackSelector : MonoBehaviour
         AttackCandidate comboCandidate = GetPhaseTwoComboCandidate();
         bool comboAvailable = comboCandidate.Attack != null;
         bool comboBlockedByRepeatLimit = comboAvailable &&
-            comboCandidate.Attack == lastSelectedAttack &&
-            consecutiveSameAttackCount >= maxConsecutiveSameAttack &&
-            candidates.Count > 0;
+            ShouldBlockRepeatedAttack(comboCandidate.Attack, candidates.Count > 0);
 
         if (comboAvailable &&
             !comboBlockedByRepeatLimit &&
@@ -248,9 +264,10 @@ public class OctopusBossAttackSelector : MonoBehaviour
         }
 
         bool comboIsAlternative = comboAvailable && comboCandidate.Attack != lastSelectedAttack;
-        bool blockLastAttack = (hasAlternative || comboIsAlternative) &&
-            lastSelectedAttack != null &&
-            consecutiveSameAttackCount >= maxConsecutiveSameAttack;
+        bool blockLastAttack = lastSelectedAttack != null &&
+            (!lastSelectedAttack.CanRepeatConsecutively ||
+             ((hasAlternative || comboIsAlternative) &&
+              consecutiveSameAttackCount >= maxConsecutiveSameAttack));
         float totalWeight = 0f;
 
         for (int i = 0; i < candidates.Count; i++)
@@ -326,6 +343,17 @@ public class OctopusBossAttackSelector : MonoBehaviour
                 $"with weight {selection.Weight:0.##}. Consecutive count: {consecutiveSameAttackCount}/{maxConsecutiveSameAttack}.",
                 this);
         }
+    }
+
+    private bool ShouldBlockRepeatedAttack(OctopusBossAttack attack, bool hasAlternative)
+    {
+        if (attack == null || attack != lastSelectedAttack)
+            return false;
+
+        if (!attack.CanRepeatConsecutively)
+            return true;
+
+        return hasAlternative && consecutiveSameAttackCount >= maxConsecutiveSameAttack;
     }
 
     private void CacheReferences()

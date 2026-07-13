@@ -78,6 +78,11 @@ public class TentacleSlamAttack : OctopusBossAttack
             slamSpawnPoints.Length > 0;
     }
 
+    public override void CancelActiveAttack()
+    {
+        CleanupActiveSlam();
+    }
+
     public override IEnumerator Execute(OctopusBossController boss)
     {
         Transform firstSlamPoint = SelectSlamPoint(boss, null);

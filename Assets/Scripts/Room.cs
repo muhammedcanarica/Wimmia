@@ -13,6 +13,15 @@ public class Room : MonoBehaviour
     [SerializeField] private Vector2 cameraPadding = Vector2.zero;
     [SerializeField, Min(0f)] private float arenaTransitionDuration = 0.35f;
     [SerializeField] private float minimumOrthographicSize = 0.1f;
+
+    [Header("Optional Camera Override")]
+    [SerializeField] private bool allowCameraOverride;
+    [SerializeField] private bool startWithCameraOverride;
+    [SerializeField] private BoxCollider2D overrideCameraBounds;
+    [SerializeField, Min(0.01f)] private float overrideOrthographicSize = 8.5f;
+    [SerializeField] private bool useCinemachineConfiner2D = true;
+    [SerializeField] private CinemachineConfiner2D confiner2D;
+
     [SerializeField] private Color activeGizmoFillColor = new Color(1f, 0.9f, 0.1f, 0.16f);
     [SerializeField] private Color activeGizmoOutlineColor = new Color(1f, 0.9f, 0.1f, 1f);
     [SerializeField] private Color inactiveGizmoFillColor = new Color(1f, 0.15f, 0.15f, 0.12f);
@@ -24,16 +33,23 @@ public class Room : MonoBehaviour
 
     private Transform trackedPlayer;
     private float preferredOrthographicSize = -1f;
+    private bool cameraOverrideActive;
+    private bool warnedMissingOverrideBounds;
+    private bool warnedMissingConfiner;
 
     public CinemachineVirtualCameraBase VirtualCamera => virtualCamera;
     public bool UsesArenaOverview => fitCameraToRoom && showEntireRoom;
     public float ArenaTransitionDuration => arenaTransitionDuration;
+    public bool IsCameraOverrideActive => cameraOverrideActive;
 
     private void Awake()
     {
         EnsureTriggerCollider();
         ResolveCameraBoundsCollider();
         CachePreferredOrthographicSize();
+        ResolveConfiner2D();
+        cameraOverrideActive = allowCameraOverride && startWithCameraOverride;
+        RefreshConfiner2D();
 
         if (virtualCamera == null)
         {
@@ -51,6 +67,8 @@ public class Room : MonoBehaviour
     {
         EnsureTriggerCollider();
         ResolveCameraBoundsCollider();
+        ResolveConfiner2D();
+        overrideOrthographicSize = Mathf.Max(0.01f, overrideOrthographicSize);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -88,6 +106,18 @@ public class Room : MonoBehaviour
         virtualCamera.Priority = prioritySettings;
     }
 
+    public void SetCameraOverrideActive(bool isActive)
+    {
+        cameraOverrideActive = allowCameraOverride && isActive;
+        RefreshConfiner2D();
+
+        CameraManager cameraManager = CameraManager.Instance;
+        if (cameraManager != null && cameraManager.CurrentRoom == this)
+        {
+            FitCameraToRoom(Camera.main, GetCurrentScreenAspect());
+        }
+    }
+
     public void FitCameraToRoom(Camera outputCamera, float screenAspect)
     {
         ResetOutputCameraViewport(outputCamera);
@@ -106,16 +136,19 @@ public class Room : MonoBehaviour
         CachePreferredOrthographicSize(cinemachineCamera);
 
         float safeAspect = screenAspect > 0.0001f ? screenAspect : GetCurrentScreenAspect();
-        Bounds bounds = GetCameraBounds();
-        float targetOrthographicSize = showEntireRoom
-            ? CalculateOverviewOrthographicSize(bounds, safeAspect)
-            : CalculateOrthographicSize(bounds, safeAspect);
+        BoxCollider2D activeBoundsCollider = ResolveActiveCameraBoundsCollider();
+        Bounds bounds = GetCameraBounds(activeBoundsCollider);
+        float targetOrthographicSize = cameraOverrideActive
+            ? CalculateOverrideOrthographicSize(bounds, safeAspect)
+            : showEntireRoom
+                ? CalculateOverviewOrthographicSize(bounds, safeAspect)
+                : CalculateOrthographicSize(bounds, safeAspect);
 
         LensSettings lens = cinemachineCamera.Lens;
         lens.OrthographicSize = targetOrthographicSize;
         cinemachineCamera.Lens = lens;
 
-        if (showEntireRoom)
+        if (cameraOverrideActive || showEntireRoom)
         {
             AlignCameraToRoomCenter(bounds);
             return;
@@ -183,15 +216,46 @@ public class Room : MonoBehaviour
         preferredOrthographicSize = Mathf.Max(0.01f, cinemachineCamera.Lens.OrthographicSize);
     }
 
-    private Bounds GetCameraBounds()
+    private BoxCollider2D ResolveActiveCameraBoundsCollider()
     {
-        BoxCollider2D boundsCollider = ResolveCameraBoundsCollider();
+        if (cameraOverrideActive)
+        {
+            if (overrideCameraBounds != null)
+            {
+                return overrideCameraBounds;
+            }
+
+            if (!warnedMissingOverrideBounds)
+            {
+                warnedMissingOverrideBounds = true;
+                Debug.LogWarning(
+                    $"[{nameof(Room)}] Camera override on '{name}' has no override bounds. Falling back to the room camera bounds.",
+                    this);
+            }
+        }
+
+        return ResolveCameraBoundsCollider();
+    }
+
+    private Bounds GetCameraBounds(BoxCollider2D boundsCollider)
+    {
         if (boundsCollider == null)
         {
             return new Bounds(transform.position, Vector3.zero);
         }
 
         return BuildBounds(boundsCollider);
+    }
+
+    private float CalculateOverrideOrthographicSize(Bounds bounds, float screenAspect)
+    {
+        float usableWidth = Mathf.Max(0.01f, bounds.size.x);
+        float usableHeight = Mathf.Max(0.01f, bounds.size.y);
+        float maxSizeByWidth = usableWidth / (2f * Mathf.Max(screenAspect, 0.0001f));
+        float maxSizeByHeight = usableHeight * 0.5f;
+        float maxAllowedSize = Mathf.Max(0.01f, Mathf.Min(maxSizeByWidth, maxSizeByHeight));
+        float requestedSize = Mathf.Max(0.01f, overrideOrthographicSize);
+        return Mathf.Min(requestedSize, maxAllowedSize);
     }
 
     private float CalculateOrthographicSize(Bounds bounds, float screenAspect)
@@ -255,6 +319,58 @@ public class Room : MonoBehaviour
         cameraTransform.position = new Vector3(bounds.center.x, bounds.center.y, currentPosition.z);
     }
 
+    private CinemachineConfiner2D ResolveConfiner2D()
+    {
+        if (confiner2D == null && virtualCamera != null)
+        {
+            confiner2D = virtualCamera.GetComponent<CinemachineConfiner2D>();
+        }
+
+        return confiner2D;
+    }
+
+    private void RefreshConfiner2D()
+    {
+        CinemachineConfiner2D resolvedConfiner = ResolveConfiner2D();
+        if (!cameraOverrideActive || !useCinemachineConfiner2D)
+        {
+            if (resolvedConfiner != null)
+            {
+                resolvedConfiner.enabled = false;
+            }
+
+            return;
+        }
+
+        BoxCollider2D boundsCollider = ResolveActiveCameraBoundsCollider();
+        if (boundsCollider == null)
+        {
+            if (resolvedConfiner != null)
+            {
+                resolvedConfiner.enabled = false;
+            }
+
+            return;
+        }
+
+        if (resolvedConfiner == null)
+        {
+            if (!warnedMissingConfiner)
+            {
+                warnedMissingConfiner = true;
+                Debug.LogWarning(
+                    $"[{nameof(Room)}] Camera override on '{name}' requested Cinemachine Confiner 2D, but the virtual camera has no confiner component.",
+                    this);
+            }
+
+            return;
+        }
+
+        resolvedConfiner.BoundingShape2D = boundsCollider;
+        resolvedConfiner.InvalidateBoundingShapeCache();
+        resolvedConfiner.enabled = true;
+    }
+
     private void OnDrawGizmos()
     {
         BoxCollider2D roomTrigger = GetComponent<BoxCollider2D>();
@@ -273,6 +389,11 @@ public class Room : MonoBehaviour
         if (boundsCollider != null && boundsCollider != roomTrigger)
         {
             DrawColliderGizmo(boundsCollider, new Color(0.1f, 0.7f, 1f, 0.08f), new Color(0.15f, 0.75f, 1f, 0.9f), false);
+        }
+
+        if (overrideCameraBounds != null && overrideCameraBounds != boundsCollider && overrideCameraBounds != roomTrigger)
+        {
+            DrawColliderGizmo(overrideCameraBounds, new Color(0.65f, 0.2f, 1f, 0.08f), new Color(0.75f, 0.3f, 1f, 0.95f), false);
         }
 
         DrawCameraGizmo();

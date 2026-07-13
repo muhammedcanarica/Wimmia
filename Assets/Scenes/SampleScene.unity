@@ -119,6 +119,179 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &407251
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 407252}
+  - component: {fileID: 407254}
+  - component: {fileID: 407253}
+  m_Layer: 0
+  m_Name: BossEntranceDoor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &407252
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 407251}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -5.25, y: -0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1309635831}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &407253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 407251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aec39a0943c4fd442ae22925c707fb07, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Door
+  blockingCollider: {fileID: 407254}
+  animator: {fileID: 0}
+  openParameterName: IsOpen
+  startOpen: 1
+--- !u!61 &407254
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 407251}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.5, y: 8}
+  m_EdgeRadius: 0
+--- !u!1 &25190374
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 25190376}
+  - component: {fileID: 25190375}
+  m_Layer: 0
+  m_Name: Room5BossCameraBounds
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!61 &25190375
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 25190374}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: -2.5, y: 1.5}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 40, y: 19.75}
+  m_EdgeRadius: 0
+--- !u!4 &25190376
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 25190374}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 16, y: -1.8, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1309635831}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &60345948
 GameObject:
   m_ObjectHideFlags: 0
@@ -2220,6 +2393,7 @@ GameObject:
   m_Component:
   - component: {fileID: 237192466}
   - component: {fileID: 237192465}
+  - component: {fileID: 237192467}
   m_Layer: 0
   m_Name: Room5 Boss Cinemachine
   m_TagString: Untagged
@@ -2252,7 +2426,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 34
-    OrthographicSize: 10.5
+    OrthographicSize: 9.530055
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -2285,6 +2459,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1309635831}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &237192467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 237192464}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f453f694addf4275988fac205bc91968, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineConfiner2D
+  BoundingShape2D: {fileID: 25190375}
+  Damping: 0
+  SlowingDistance: 0
+  OversizeWindow:
+    Enabled: 0
+    MaxWindowSize: 0
+    Padding: 0
+  m_LegacyMaxWindowSize: -2
 --- !u!1 &237592036
 GameObject:
   m_ObjectHideFlags: 0
@@ -6977,7 +7171,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 13.5, y: -0.5}
+  m_Offset: {x: 14, y: -0.5}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -6987,7 +7181,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 38, y: 20}
+  m_Size: {x: 39, y: 20}
   m_EdgeRadius: 0
 --- !u!1 &285614820
 GameObject:
@@ -7028,6 +7222,230 @@ Transform:
   - {fileID: 1728861117}
   m_Father: {fileID: 1309635831}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &292377144
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 292377145}
+  - component: {fileID: 292377147}
+  - component: {fileID: 292377146}
+  - component: {fileID: 292377149}
+  - component: {fileID: 292377148}
+  m_Layer: 0
+  m_Name: Room5EnterTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &292377145
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 292377144}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.75, y: -0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1309635831}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &292377146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 292377144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f60bf0bef2e0b749b46c19c027d45c7, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Room5EnterTrigger
+  room5: {fileID: 1309635829}
+  playerTag: Player
+  activateOnce: 1
+  boss: {fileID: 378471844}
+  restoreNormalCameraOnBossDefeated: 1
+  roomToActivateAfterBossDefeat: {fileID: 0}
+--- !u!61 &292377147
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 292377144}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 2, y: 8}
+  m_EdgeRadius: 0
+--- !u!114 &292377148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 292377144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dcd7cd31c8c61d43989c7d0e7a3838b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Room5BossEncounterController
+  bossController: {fileID: 378471844}
+  attackSelector: {fileID: 378471848}
+  encounterTrigger: {fileID: 292377147}
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  startOnlyOnce: 1
+  entranceDoor: {fileID: 407253}
+  exitDoor: {fileID: 1905292998}
+  room5Camera: {fileID: 292377146}
+  introDelay: 1.25
+  deathDelay: 1.25
+  bossMusicSource: {fileID: 292377149}
+  bossMusicClip: {fileID: 0}
+  victoryMusicClip: {fileID: 0}
+  bossHealthBar: {fileID: 0}
+--- !u!82 &292377149
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 292377144}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &328454611
 GameObject:
   m_ObjectHideFlags: 0
@@ -7075,6 +7493,7 @@ GameObject:
   - component: {fileID: 378471846}
   - component: {fileID: 378471849}
   - component: {fileID: 378471850}
+  - component: {fileID: 378471851}
   m_Layer: 0
   m_Name: OctopusBoss
   m_TagString: Untagged
@@ -7278,12 +7697,16 @@ MonoBehaviour:
   - attack: {fileID: 378471849}
     phaseOneWeight: 20
     phaseTwoWeight: 35
+  - attack: {fileID: 378471851}
+    phaseOneWeight: 12
+    phaseTwoWeight: 22
   attacks:
   - {fileID: 378471847}
   - {fileID: 378471846}
   - {fileID: 378471849}
-  startLoopOnEnable: 1
-  initialAttackDelay: 1
+  - {fileID: 378471851}
+  startLoopOnEnable: 0
+  initialAttackDelay: 0
   attackCooldown: 1.4
   phaseTwoAttackCooldown: 0.7
   phaseTwoComboAttack: {fileID: 378471850}
@@ -7344,6 +7767,83 @@ MonoBehaviour:
   dropAttack: {fileID: 378471849}
   sideSweepAttack: {fileID: 378471846}
   sideSweepDelayAfterFirstDrop: 0.5
+--- !u!114 &378471851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378471842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 944b64f002a9a4d4da90322c79c0e6da, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::OctopusSlowFieldAttack
+  slowFieldPrefab: {fileID: 8034859525049162607, guid: 151087888f73cfa48819f826f7393913, type: 3}
+  slowFieldWarningPrefab: {fileID: 891189664560276665, guid: 31b2f9cdf7512f44d86fc0bc606d4f06, type: 3}
+  noteProjectilePrefab: {fileID: 7197973982210549440, guid: e3873ad94faeeac4a8aaeaac759bb7d1, type: 3}
+  weakPointPrefab: {fileID: 4281627501744031585, guid: 222fdb07ec6c31c45bafd91a2b1076ac, type: 3}
+  playerTarget: {fileID: 959076609}
+  noteSpawnPoints:
+  - {fileID: 1607138029}
+  - {fileID: 408114133}
+  - {fileID: 793569222}
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  groundProbeHeight: 8
+  fieldSize: {x: 6, y: 2.4}
+  warningDurationPhase1: 0.8
+  warningDurationPhase2: 0.55
+  fieldDurationPhase1: 3.2
+  fieldDurationPhase2: 3.8
+  movementMultiplierPhase1: 0.65
+  movementMultiplierPhase2: 0.5
+  noteWaveCountPhase1: 3
+  noteWaveCountPhase2: 4
+  notesPerWavePhase1: 2
+  notesPerWavePhase2: 3
+  waveIntervalPhase1: 0.65
+  waveIntervalPhase2: 0.45
+  noteSpreadAngle: 14
+  noteProjectileSpeed: 8.5
+  phase2ProjectileSpeedMultiplier: 1.2
+  projectileLifetime: 4
+  playerDamage: 1
+  vulnerableDurationPhase1: 1
+  vulnerableDurationPhase2: 0.8
+  recoverDuration: 0.4
+--- !u!1 &408114132
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 408114133}
+  m_Layer: 0
+  m_Name: NoteSpawn_Center
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &408114133
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408114132}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.8, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 819416484}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &416253370
 GameObject:
   m_ObjectHideFlags: 0
@@ -7794,6 +8294,15 @@ MonoBehaviour:
   boss: {fileID: 378471844}
   damageMultiplier: 1
   isVulnerable: 1
+  weakPointVisual: {fileID: 486671694}
+  inactiveColor: {r: 0.45, g: 0.25, b: 0.55, a: 0.2}
+  vulnerableColor: {r: 1, g: 0.55, b: 0.95, a: 1}
+  pulseScaleMultiplier: 1.12
+  pulseSpeed: 2.5
+  vulnerableLoopParticle: {fileID: 0}
+  hitParticlePrefab: {fileID: 0}
+  hitFlashDuration: 0.14
+  hideVisualWhenInactive: 1
 --- !u!61 &486671692
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -14845,6 +15354,12 @@ MonoBehaviour:
   cameraPadding: {x: 0, y: 0}
   arenaTransitionDuration: 0.35
   minimumOrthographicSize: 0.1
+  allowCameraOverride: 0
+  startWithCameraOverride: 0
+  overrideCameraBounds: {fileID: 0}
+  overrideOrthographicSize: 8.5
+  useCinemachineConfiner2D: 1
+  confiner2D: {fileID: 0}
   activeGizmoFillColor: {r: 1, g: 0.9, b: 0.1, a: 0.16}
   activeGizmoOutlineColor: {r: 1, g: 0.9, b: 0.1, a: 1}
   inactiveGizmoFillColor: {r: 1, g: 0.15, b: 0.15, a: 0.12}
@@ -20154,6 +20669,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 22, y: 0.5}
   m_EdgeRadius: 0
+--- !u!1 &793569221
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 793569222}
+  m_Layer: 0
+  m_Name: NoteSpawn_Right
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &793569222
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793569221}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.2, y: 2.2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 819416484}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &819416483
 GameObject:
   m_ObjectHideFlags: 0
@@ -20188,6 +20734,9 @@ Transform:
   - {fileID: 710360738}
   - {fileID: 1806049017}
   - {fileID: 328454612}
+  - {fileID: 1607138029}
+  - {fileID: 408114133}
+  - {fileID: 793569222}
   m_Father: {fileID: 378471843}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &821858838
@@ -25090,6 +25639,12 @@ MonoBehaviour:
   cameraPadding: {x: 0, y: 0}
   arenaTransitionDuration: 0.35
   minimumOrthographicSize: 0.1
+  allowCameraOverride: 0
+  startWithCameraOverride: 0
+  overrideCameraBounds: {fileID: 0}
+  overrideOrthographicSize: 8.5
+  useCinemachineConfiner2D: 1
+  confiner2D: {fileID: 0}
   activeGizmoFillColor: {r: 1, g: 0.9, b: 0.1, a: 0.16}
   activeGizmoOutlineColor: {r: 1, g: 0.9, b: 0.1, a: 1}
   inactiveGizmoFillColor: {r: 1, g: 0.15, b: 0.15, a: 0.12}
@@ -28240,6 +28795,12 @@ MonoBehaviour:
   cameraPadding: {x: 0.5, y: 0.5}
   arenaTransitionDuration: 0.35
   minimumOrthographicSize: 0.1
+  allowCameraOverride: 1
+  startWithCameraOverride: 1
+  overrideCameraBounds: {fileID: 25190375}
+  overrideOrthographicSize: 17
+  useCinemachineConfiner2D: 1
+  confiner2D: {fileID: 237192467}
   activeGizmoFillColor: {r: 1, g: 0.9, b: 0.1, a: 0.16}
   activeGizmoOutlineColor: {r: 1, g: 0.9, b: 0.1, a: 1}
   inactiveGizmoFillColor: {r: 1, g: 0.15, b: 0.15, a: 0.12}
@@ -28312,6 +28873,10 @@ Transform:
   - {fileID: 486671690}
   - {fileID: 1929406937}
   - {fileID: 285614821}
+  - {fileID: 25190376}
+  - {fileID: 292377145}
+  - {fileID: 407252}
+  - {fileID: 1905292997}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1339314569
@@ -28579,6 +29144,12 @@ MonoBehaviour:
   cameraPadding: {x: 0, y: 0}
   arenaTransitionDuration: 0.35
   minimumOrthographicSize: 0.1
+  allowCameraOverride: 0
+  startWithCameraOverride: 0
+  overrideCameraBounds: {fileID: 0}
+  overrideOrthographicSize: 8.5
+  useCinemachineConfiner2D: 1
+  confiner2D: {fileID: 0}
   activeGizmoFillColor: {r: 1, g: 0.9, b: 0.1, a: 0.16}
   activeGizmoOutlineColor: {r: 1, g: 0.9, b: 0.1, a: 1}
   inactiveGizmoFillColor: {r: 1, g: 0.15, b: 0.15, a: 0.12}
@@ -29374,6 +29945,37 @@ Grid:
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
+--- !u!1 &1607138028
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1607138029}
+  m_Layer: 0
+  m_Name: NoteSpawn_Left
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1607138029
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1607138028}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.2, y: 2.2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 819416484}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1610580743
 GameObject:
   m_ObjectHideFlags: 0
@@ -36335,6 +36937,12 @@ MonoBehaviour:
   cameraPadding: {x: 0, y: 0}
   arenaTransitionDuration: 0.35
   minimumOrthographicSize: 0.1
+  allowCameraOverride: 0
+  startWithCameraOverride: 0
+  overrideCameraBounds: {fileID: 0}
+  overrideOrthographicSize: 8.5
+  useCinemachineConfiner2D: 1
+  confiner2D: {fileID: 0}
   activeGizmoFillColor: {r: 1, g: 0.9, b: 0.1, a: 0.16}
   activeGizmoOutlineColor: {r: 1, g: 0.9, b: 0.1, a: 1}
   inactiveGizmoFillColor: {r: 1, g: 0.15, b: 0.15, a: 0.12}
@@ -38522,6 +39130,101 @@ Transform:
   m_Children: []
   m_Father: {fileID: 833476628}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1905292996
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1905292997}
+  - component: {fileID: 1905292999}
+  - component: {fileID: 1905292998}
+  m_Layer: 0
+  m_Name: BossExitDoor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1905292997
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905292996}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 33.25, y: -0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1309635831}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1905292998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905292996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aec39a0943c4fd442ae22925c707fb07, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Door
+  blockingCollider: {fileID: 1905292999}
+  animator: {fileID: 0}
+  openParameterName: IsOpen
+  startOpen: 0
+--- !u!61 &1905292999
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905292996}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.5, y: 8}
+  m_EdgeRadius: 0
 --- !u!1 &1915099567
 GameObject:
   m_ObjectHideFlags: 0

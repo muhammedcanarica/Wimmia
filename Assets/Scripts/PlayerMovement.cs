@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -87,6 +88,12 @@ public class PlayerMovement : MonoBehaviour
     // External forces (CurrentZone, etc.) — consumed each FixedUpdate
     private Vector2 externalVelocityAccum;
 
+    // Source-based modifiers let temporary effects remove only their own entry
+    // without mutating or restoring serialized movement values.
+    private readonly Dictionary<Object, float> externalMovementMultipliers = new Dictionary<Object, float>();
+    private readonly List<Object> staleMovementModifierSources = new List<Object>();
+    private float combinedExternalMovementMultiplier = 1f;
+
     /// <summary>True while gravity is slowly blending back after a water exit.</summary>
     private bool isWaterExitTransition;
     private float waterExitGravityTimer;
@@ -96,6 +103,7 @@ public class PlayerMovement : MonoBehaviour
     public bool IsGrounded => isGrounded;
     public bool CanJump => CanUseLandJump();
     public Vector2 FacingDirection => facingRight ? Vector2.right : Vector2.left;
+    public float CurrentExternalMovementMultiplier => combinedExternalMovementMultiplier;
     private bool isInWater => stateMachine != null && stateMachine.CurrentMode == PlayerMode.Water;
 
     private void Awake()
@@ -116,6 +124,13 @@ public class PlayerMovement : MonoBehaviour
                 groundCheck = detectedGroundCheck;
             }
         }
+    }
+
+    private void OnDisable()
+    {
+        externalMovementMultipliers.Clear();
+        staleMovementModifierSources.Clear();
+        combinedExternalMovementMultiplier = 1f;
     }
 
     public void Initialize(PlayerStateMachine machine)
@@ -282,6 +297,24 @@ public class PlayerMovement : MonoBehaviour
         externalVelocityAccum += velocity;
     }
 
+    public void SetExternalMovementMultiplier(Object source, float multiplier)
+    {
+        if (source == null)
+            return;
+
+        externalMovementMultipliers[source] = Mathf.Clamp(multiplier, 0.05f, 3f);
+        RecalculateExternalMovementMultiplier();
+    }
+
+    public void RemoveExternalMovementMultiplier(Object source)
+    {
+        if (source == null)
+            return;
+
+        if (externalMovementMultipliers.Remove(source))
+            RecalculateExternalMovementMultiplier();
+    }
+
     public void Move(Vector2 moveInput)
     {
         SetFacingFromDirection(moveInput.x);
@@ -375,7 +408,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyWaterMovement(Vector2 moveInput, Vector2 externalVelocity)
     {
-        float targetVerticalVelocity = moveInput.y * waterMoveSpeed
+        float movementMultiplier = combinedExternalMovementMultiplier;
+        float currentWaterMoveSpeed = waterMoveSpeed * movementMultiplier;
+        float targetVerticalVelocity = moveInput.y * currentWaterMoveSpeed
             + externalVelocity.y
             + waterIdleVerticalDrift
             + waterBuoyancy;
@@ -387,11 +422,12 @@ public class PlayerMovement : MonoBehaviour
 
         // External push is added to the target so smoothing works with it, not against it
         Vector2 targetVelocity = new Vector2(
-            moveInput.x * waterMoveSpeed + externalVelocity.x,
+            moveInput.x * currentWaterMoveSpeed + externalVelocity.x,
             targetVerticalVelocity);
-        float smoothTime = moveInput.sqrMagnitude > 0.0001f
+        float baseSmoothTime = moveInput.sqrMagnitude > 0.0001f
             ? waterAccelerationTime
             : waterDecelerationTime;
+        float smoothTime = baseSmoothTime / Mathf.Max(0.05f, movementMultiplier);
 
         Vector2 nextVelocity = Vector2.SmoothDamp(
             rb.linearVelocity,
@@ -410,12 +446,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isInWater) return;
 
-        float targetVelocityX = horizontalInput * landMoveSpeed + externalVelocity.x;
+        float movementMultiplier = combinedExternalMovementMultiplier;
+        float targetVelocityX = horizontalInput * landMoveSpeed * movementMultiplier + externalVelocity.x;
         bool hasInput = Mathf.Abs(horizontalInput) > 0.0001f;
         bool groundedForMovement = isGrounded && !isWaterExitTransition;
         float acceleration = hasInput
             ? (groundedForMovement ? landGroundAcceleration : landAirAcceleration)
             : (groundedForMovement ? landGroundDeceleration : landAirDeceleration);
+        acceleration *= movementMultiplier;
         float nextVelocityX = Mathf.MoveTowards(
             rb.linearVelocity.x,
             targetVelocityX,
@@ -424,6 +462,29 @@ public class PlayerMovement : MonoBehaviour
         // Vertical external push (e.g. upward current) applied directly
         float nextVelocityY = rb.linearVelocity.y + externalVelocity.y * Time.fixedDeltaTime;
         rb.linearVelocity = new Vector2(nextVelocityX, nextVelocityY);
+    }
+
+    private void RecalculateExternalMovementMultiplier()
+    {
+        float combinedMultiplier = 1f;
+        staleMovementModifierSources.Clear();
+
+        foreach (KeyValuePair<Object, float> entry in externalMovementMultipliers)
+        {
+            if (entry.Key == null)
+            {
+                staleMovementModifierSources.Add(entry.Key);
+                continue;
+            }
+
+            combinedMultiplier *= entry.Value;
+        }
+
+        for (int i = 0; i < staleMovementModifierSources.Count; i++)
+            externalMovementMultipliers.Remove(staleMovementModifierSources[i]);
+
+        staleMovementModifierSources.Clear();
+        combinedExternalMovementMultiplier = Mathf.Clamp(combinedMultiplier, 0.05f, 3f);
     }
 
     private void ApplyLandGravity()
