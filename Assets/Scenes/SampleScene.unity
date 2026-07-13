@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aec39a0943c4fd442ae22925c707fb07, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Door
   blockingCollider: {fileID: 407254}
   animator: {fileID: 0}
@@ -2469,7 +2469,7 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f453f694addf4275988fac205bc91968, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineConfiner2D
   BoundingShape2D: {fileID: 25190375}
   Damping: 0
@@ -7267,7 +7267,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f60bf0bef2e0b749b46c19c027d45c7, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room5EnterTrigger
   room5: {fileID: 1309635829}
   playerTag: Player
@@ -7331,7 +7331,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9dcd7cd31c8c61d43989c7d0e7a3838b, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room5BossEncounterController
   bossController: {fileID: 378471844}
   attackSelector: {fileID: 378471848}
@@ -7349,6 +7349,7 @@ MonoBehaviour:
   bossMusicClip: {fileID: 0}
   victoryMusicClip: {fileID: 0}
   bossHealthBar: {fileID: 0}
+  debugLogs: 0
 --- !u!82 &292377149
 AudioSource:
   m_ObjectHideFlags: 0
@@ -7777,7 +7778,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 944b64f002a9a4d4da90322c79c0e6da, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OctopusSlowFieldAttack
   slowFieldPrefab: {fileID: 8034859525049162607, guid: 151087888f73cfa48819f826f7393913, type: 3}
   slowFieldWarningPrefab: {fileID: 891189664560276665, guid: 31b2f9cdf7512f44d86fc0bc606d4f06, type: 3}
@@ -39173,7 +39174,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aec39a0943c4fd442ae22925c707fb07, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Door
   blockingCollider: {fileID: 1905292999}
   animator: {fileID: 0}

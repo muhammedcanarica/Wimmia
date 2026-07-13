@@ -600,6 +600,7 @@ public static class OctopusBossSceneInstaller
         SetObject(encounterObject, "victoryMusicClip", null);
         SetObject(encounterObject, "bossHealthBar", null);
         SetBool(encounterObject, "startOnlyOnce", true);
+        SetBool(encounterObject, "debugLogs", false);
         encounterObject.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(encounter);
         EditorUtility.SetDirty(cameraTrigger.gameObject);

@@ -33,6 +33,9 @@ public class Room5BossEncounterController : MonoBehaviour
     [Header("Optional UI")]
     [SerializeField] private GameObject bossHealthBar;
 
+    [Header("Debug")]
+    [SerializeField] private bool debugLogs;
+
     private Coroutine introRoutine;
     private Coroutine deathRoutine;
     private bool hasStarted;
@@ -68,6 +71,14 @@ public class Room5BossEncounterController : MonoBehaviour
             HandleBossDied();
     }
 
+    private IEnumerator Start()
+    {
+        // Trigger callbacks are not guaranteed when the player is already past
+        // the entrance trigger at scene start (checkpoint/test spawn).
+        yield return null;
+        TryStartForPlayerAlreadyInsideRoom5();
+    }
+
     private void OnDisable()
     {
         UnsubscribeFromBossDeath();
@@ -84,19 +95,35 @@ public class Room5BossEncounterController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (IsPlayerCollider(other))
-            BeginEncounter();
+        TryStartFromTrigger(other, "OnTriggerEnter2D");
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        TryStartFromTrigger(other, "OnTriggerStay2D");
     }
 
     public void BeginEncounter()
     {
         ResolveReferences();
 
-        if (encounterCompleted || encounterActive)
+        if (encounterCompleted)
+        {
+            DebugEncounter("Encounter başlatılamadı: encounter daha önce tamamlandı.");
             return;
+        }
+
+        if (encounterActive)
+        {
+            DebugEncounter("Encounter başlatılamadı: encounter zaten aktif.");
+            return;
+        }
 
         if (startOnlyOnce && hasStarted)
+        {
+            DebugEncounter("Encounter başlatılamadı: startOnlyOnce açık ve encounter daha önce başlatıldı.");
             return;
+        }
 
         if (bossController == null)
         {
@@ -120,6 +147,7 @@ public class Room5BossEncounterController : MonoBehaviour
         exitDoor?.Close();
         SetBossHealthBarVisible(true);
         StartBossMusic();
+        DebugEncounter($"Intro başladı. Süre: {introDelay:0.##} saniye. Boss state: {bossController.CurrentState}.");
 
         if (introRoutine != null)
             StopCoroutine(introRoutine);
@@ -134,8 +162,17 @@ public class Room5BossEncounterController : MonoBehaviour
 
         introRoutine = null;
 
-        if (!encounterActive || encounterCompleted || bossController == null || bossController.IsDead)
+        if (!encounterActive || encounterCompleted)
+        {
+            DebugEncounter("Attack selector başlatılmadı: encounter artık aktif değil veya tamamlandı.");
             yield break;
+        }
+
+        if (bossController == null || bossController.IsDead)
+        {
+            DebugEncounter("Attack selector başlatılmadı: boss referansı eksik veya boss ölü.");
+            yield break;
+        }
 
         if (attackSelector == null)
         {
@@ -143,7 +180,31 @@ public class Room5BossEncounterController : MonoBehaviour
             yield break;
         }
 
+        if (!attackSelector.gameObject.activeInHierarchy)
+        {
+            Debug.LogWarning($"[{nameof(Room5BossEncounterController)}] Attack Selector GameObject is inactive, so the attack loop cannot start.", this);
+            yield break;
+        }
+
+        if (!attackSelector.enabled)
+        {
+            attackSelector.enabled = true;
+            DebugEncounter("Attack Selector component disabled durumdaydı ve encounter tarafından etkinleştirildi.");
+        }
+
         attackSelector.StartLoop();
+
+        if (attackSelector.IsLoopRunning)
+        {
+            DebugEncounter($"Attack selector başlatıldı. Boss state: {bossController.CurrentState}.");
+        }
+        else
+        {
+            Debug.LogWarning(
+                $"[{nameof(Room5BossEncounterController)}] Attack Selector StartLoop çağrıldı fakat loop başlamadı. " +
+                $"Selector enabled: {attackSelector.enabled}, Boss state: {bossController.CurrentState}, Boss dead: {bossController.IsDead}.",
+                this);
+        }
     }
 
     private void HandleBossDied()
@@ -222,6 +283,72 @@ public class Room5BossEncounterController : MonoBehaviour
             return true;
 
         return other.GetComponentInParent<PlayerController>() != null;
+    }
+
+    private void TryStartFromTrigger(Collider2D other, string callbackName)
+    {
+        DebugEncounter($"Encounter trigger algılandı ({callbackName}): {(other != null ? other.name : "null")}.");
+
+        if (!IsPlayerCollider(other))
+        {
+            DebugEncounter("Encounter başlatılmadı: collider Player layer/tag/controller doğrulamasından geçmedi.");
+            return;
+        }
+
+        DebugEncounter("Player doğrulandı. Encounter başlatılıyor.");
+        BeginEncounter();
+    }
+
+    private void TryStartForPlayerAlreadyInsideRoom5()
+    {
+        if (hasStarted || encounterActive || encounterCompleted)
+            return;
+
+        PlayerController player = FindFirstObjectByType<PlayerController>();
+        if (player == null)
+        {
+            DebugEncounter("Başlangıç kontrolü encounter başlatmadı: aktif PlayerController bulunamadı.");
+            return;
+        }
+
+        Collider2D[] playerColliders = player.GetComponentsInChildren<Collider2D>();
+        for (int i = 0; i < playerColliders.Length; i++)
+        {
+            Collider2D playerCollider = playerColliders[i];
+            if (IsPlayerCollider(playerCollider) && OverlapsIn2D(encounterTrigger, playerCollider))
+            {
+                DebugEncounter("Player sahne başlangıcında EncounterTrigger içinde bulundu. Encounter başlatılıyor.");
+                BeginEncounter();
+                return;
+            }
+        }
+
+        Room room5 = GetComponentInParent<Room>();
+        Collider2D roomArea = room5 != null ? room5.GetComponent<Collider2D>() : null;
+        if (roomArea != null && roomArea.OverlapPoint(player.transform.position))
+        {
+            DebugEncounter("Player giriş trigger'ını geçmiş ve Room5 içinde başladı. Encounter güvenli şekilde başlatılıyor.");
+            BeginEncounter();
+        }
+    }
+
+    private static bool OverlapsIn2D(Collider2D first, Collider2D second)
+    {
+        if (first == null || second == null || !first.enabled || !second.enabled)
+            return false;
+
+        Bounds firstBounds = first.bounds;
+        Bounds secondBounds = second.bounds;
+        return firstBounds.min.x <= secondBounds.max.x &&
+            firstBounds.max.x >= secondBounds.min.x &&
+            firstBounds.min.y <= secondBounds.max.y &&
+            firstBounds.max.y >= secondBounds.min.y;
+    }
+
+    private void DebugEncounter(string message)
+    {
+        if (debugLogs)
+            Debug.Log($"[{nameof(Room5BossEncounterController)}] {message}", this);
     }
 
     private void StartBossMusic()
